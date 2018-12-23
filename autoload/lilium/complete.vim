@@ -1,3 +1,32 @@
+
+" ======= YCM interop =====================================
+
+func! s:HasYCM() " {{{
+    return exists('#youcompleteme')
+endfunc " }}}
+
+let s:ycmEnabled = 1
+func! s:SetYCMEnabled(isEnabled) " {{{
+    if !s:HasYCM()
+        return
+    endif
+
+    if a:isEnabled == s:ycmEnabled
+        " nothing to do
+        return
+    endif
+    let s:ycmEnabled = a:isEnabled
+
+    if a:isEnabled
+        call youcompleteme#EnableCursorMovedAutocommands()
+    else
+        call youcompleteme#DisableCursorMovedAutocommands()
+    endif
+endfunc " }}}
+
+
+" ======= Internal utils ==================================
+
 func! s:LineBeforeCursor() " {{{
     let line = getline('.')
     let cursor = col('.')
@@ -33,13 +62,13 @@ func! s:FindPrefix(...) " {{{
     return matchstr(before_on_line, '[#@][[:alnum:]-]*$')
 endfunc " }}}
 
-function! s:CloseCompletionMenu() " {{{
+func! s:CloseCompletionMenu() " {{{
     if pumvisible()
         call s:SendKeys( "\<C-e>" )
     endif
-endfunction " }}}
+endfunc " }}}
 
-func! s:GetFilteredCompletionsFor(prefix)
+func! s:GetFilteredCompletionsFor(prefix) " {{{
     let type = a:prefix[0]
     let prefix = a:prefix[1:] " trim the # or @
     let items = []
@@ -73,16 +102,25 @@ func! s:GetFilteredCompletionsFor(prefix)
         \ 'wordField': wordField,
         \ 'menuField': menuField
         \ }
-endfunc
+endfunc " }}}
 
 func! s:OnTextChangedInsertMode() " {{{
     let prefix = s:FindPrefix()
     if prefix != ''
+        call s:SetYCMEnabled(0)
         call s:TriggerComplete(prefix)
+    else
+        call s:SetYCMEnabled(1)
     endif
 endfunc " }}}
 
-func! s:TriggerComplete(prefix)
+func! s:OnInsertChar() " {{{
+    if v:char == '#'
+        call s:SetYCMEnabled(0)
+    endif
+endfunc " }}}
+
+func! s:TriggerComplete(prefix) " {{{
     if len(a:prefix) == 0
         return
     endif
@@ -95,23 +133,24 @@ func! s:TriggerComplete(prefix)
         return
     endif
 
-    if len(a:prefix) == 1
-        " with just the prefix, we simply use <c-p> to clear to the prefix
-        call s:FeedKeys("\<C-X>\<C-O>\<C-P>")
+    if !s:HasYCM()
+        if len(a:prefix) == 1
+            " with just the prefix, we simply use <c-p> to clear to the prefix
+            call s:FeedKeys("\<C-X>\<C-O>\<C-P>")
+        else
+            " with more than just the prefix typed, we use <c-n><c-p> to get back
+            " to what we originally typed
+            call s:FeedKeys("\<C-X>\<C-O>\<C-N>\<C-P>")
+        endif
     else
-        " with more than just the prefix typed, we use <c-n><c-p> to get back
-        " to what we originally typed
-        call s:FeedKeys("\<C-X>\<C-O>\<C-N>\<C-P>")
+        " with YCM this 'just works,' apparently
+        " (once we disable its autocmds)
+        call s:FeedKeys("\<C-X>\<C-O>\<C-P>")
     endif
-endfunc
+endfunc " }}}
 
-func! lilium#complete#LBC()
-    return s:LineBeforeCursor()
-endfunc
 
-func! lilium#complete#FP()
-    return s:FindPrefix()
-endfunc
+" ======= Public interface ================================
 
 func! lilium#complete#func(findstart, base, ...) " {{{
     " let repo_dir = lilium#repoDir()
@@ -164,5 +203,7 @@ func! lilium#complete#Enable() " {{{
     augroup liliumcursormoved
         autocmd!
         autocmd TextChangedI <buffer> call s:OnTextChangedInsertMode()
+        autocmd InsertCharPre <buffer> call s:OnInsertChar()
+        autocmd InsertLeave * call s:SetYCMEnabled(1)
     augroup END
 endfunc " }}}
