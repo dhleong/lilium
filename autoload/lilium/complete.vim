@@ -79,12 +79,12 @@ func! s:GetFilteredCompletionsFor(prefix) " {{{
     try
         if type ==# '#'
             " TODO: support cross-repo refs
-            let items = lilium#issues#Get()
+            let items = lilium#entities#Get('issues')
             let wordField = 'number'
             let menuField = 'title'
             let matchField = 'title'
         elseif type ==# '@'
-            let items = lilium#users#Get()
+            let items = lilium#entities#Get('users')
             let wordField = 'login'
             let matchField = 'login'
         endif
