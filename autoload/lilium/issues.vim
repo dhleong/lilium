@@ -9,7 +9,6 @@ func! lilium#issues#Get()
 endfunc
 
 func! lilium#issues#OnFetch(bufnr, issues)
-    let b:fetched = a:issues
     let existing = getbufvar(a:bufnr, '_lilium_issues', [])
     let new = existing + a:issues
     call setbufvar(a:bufnr, '_lilium_issues', new)

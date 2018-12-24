@@ -15,6 +15,7 @@ func! lilium#Enable() " {{{
     call lilium#complete#Enable()
 
     call lilium#issues#Prefetch()
+    call lilium#users#Prefetch()
 
     let b:_lilium_init = 1
 endfunc " }}}

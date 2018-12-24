@@ -14,24 +14,15 @@ func! s:processIssues(Callback, channel, msg)
         \ }])
 endfunc
 
-func! lilium#strategy#hub#findConfig()
-    let homeConfig = expand("~/.config") . "/hub"
-    if filereadable(homeConfig)
-        return homeConfig
-    endif
-
-    return ""
-endfunc
-
 func! lilium#strategy#hub#create()
-    let config = lilium#strategy#hub#findConfig()
+    let config = lilium#strategy#hub#config#Find()
     if config == ""
         return 0
     endif
 
     let s = {}
     func! s.repo() dict
-        return trim(system("hub browse -u"))
+        return lilium#strategy#hub#config#GetRepoUrl()
     endfunc
 
     func! s.issuesAsync(Callback) dict

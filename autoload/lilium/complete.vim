@@ -83,6 +83,10 @@ func! s:GetFilteredCompletionsFor(prefix) " {{{
             let wordField = 'number'
             let menuField = 'title'
             let matchField = 'title'
+        elseif type ==# '@'
+            let items = lilium#users#Get()
+            let wordField = 'login'
+            let matchField = 'login'
         endif
     catch
         echo 'Unable to load completions'
@@ -115,7 +119,7 @@ func! s:OnTextChangedInsertMode() " {{{
 endfunc " }}}
 
 func! s:OnInsertChar() " {{{
-    if v:char == '#'
+    if v:char == '#' || v:char == '@'
         call s:SetYCMEnabled(0)
     endif
 endfunc " }}}
