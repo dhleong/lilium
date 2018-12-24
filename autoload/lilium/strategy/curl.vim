@@ -8,8 +8,11 @@ func! s:curl(path)
     return curl . 'https://api.github.com' . a:path
 endfunc
 
-func! s:curlRepo(path)
-    let repo = lilium#strategy#hub#config#GetRepoPath()
+func! s:curlRepo(repo, path)
+    let repo = a:repo
+    if repo == ''
+        let repo = lilium#strategy#hub#config#GetRepoPath()
+    endif
     return s:curl('/repos/' . repo . a:path)
 endfunc
 
@@ -32,6 +35,11 @@ func! lilium#strategy#curl#create()
 
     func! s.repoUrl() dict
         return lilium#strategy#hub#config#GetRepoUrl()
+    endfunc
+
+    func! s.issuesAsync(repo, Callback) dict
+        let curl = s:curlRepo(a:repo, '/contributors')
+        call lilium#job#StartJson(curl, a:Callback)
     endfunc
 
     func! s.usersAsync(Callback) dict

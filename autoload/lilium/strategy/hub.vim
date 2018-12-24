@@ -29,7 +29,10 @@ func! lilium#strategy#hub#create()
         return lilium#strategy#hub#config#GetRepoUrl()
     endfunc
 
-    func! s.issuesAsync(Callback) dict
+    func! s.issuesAsync(repo, Callback) dict
+        if a:repo != ''
+            return
+        endif
         let JobCb = function('<SID>processIssues', [a:Callback])
         call job_start("hub issue -f %I:%t%n", {
             \ 'callback': JobCb,

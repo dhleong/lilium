@@ -24,13 +24,19 @@ func! lilium#entities#OnFetch(kind, bufnr, entities)
     call setbufvar(a:bufnr, key, new)
 endfunc
 
-func! lilium#entities#Prefetch(kind)
+func! lilium#entities#Prefetch(kind, ...)
     let repo = lilium#gh()
     let Callback = function('lilium#entities#OnFetch', [a:kind, bufnr('%')])
-    call repo[a:kind . 'Async'](Callback)
+    let repo = a:0 ? a:1 : ''
+    if a:kind == 'issues'
+        call gh.issuesAsync(repo, Callback)
+    else
+        call gh[a:kind . 'Async'](Callback)
+    endif
 endfunc
 
-func! lilium#entities#PrefetchAll()
-    call lilium#entities#Prefetch('issues')
-    call lilium#entities#Prefetch('users')
+func! lilium#entities#PrefetchAll(...)
+    let repo = a:0 ? a:1 : ''
+    call lilium#entities#Prefetch('issues', repo)
+    call lilium#entities#Prefetch('users', repo)
 endfunc
