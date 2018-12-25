@@ -14,7 +14,8 @@ func! lilium#strategy#hub#config#GetRepoUrl() " {{
         return existing
     endif
 
-    let url = trim(system("hub browse -u"))
+    let urlIssues = trim(system("hub browse -u -- issues"))
+    let url = substitute(urlIssues, '/issues$', '', '')
     let b:_lily_repo_url = url
     return url
 endfunc " }}}

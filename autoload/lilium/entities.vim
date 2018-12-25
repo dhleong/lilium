@@ -25,7 +25,7 @@ func! lilium#entities#OnFetch(kind, bufnr, entities)
 endfunc
 
 func! lilium#entities#Prefetch(kind)
-    let repo = lilium#gh#get()
+    let repo = lilium#gh()
     let Callback = function('lilium#entities#OnFetch', [a:kind, bufnr('%')])
     call repo[a:kind . 'Async'](Callback)
 endfunc

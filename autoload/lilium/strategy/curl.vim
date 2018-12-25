@@ -27,6 +27,10 @@ func! lilium#strategy#curl#create()
 
     let s = {}
     func! s.repo() dict
+        return lilium#strategy#hub#config#GetRepoPath()
+    endfunc
+
+    func! s.repoUrl() dict
         return lilium#strategy#hub#config#GetRepoUrl()
     endfunc
 
