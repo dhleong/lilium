@@ -37,5 +37,9 @@ func! lilium#strategy#hub#create()
             \ })
     endfunc
 
+    func! s.usersAsync(Callback) dict
+        " nop; Hub doesn't support listing collaborators
+    endfunc
+
     return s
 endfunc
