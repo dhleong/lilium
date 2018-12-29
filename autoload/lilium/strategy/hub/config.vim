@@ -15,6 +15,10 @@ func! lilium#strategy#hub#config#GetRepoUrl() " {{
     endif
 
     let urlIssues = trim(system("hub browse -u -- issues"))
+    if urlIssues =~# "^Aborted" && getcwd() =~# "/.git$"
+        let urlIssues = trim(system("cd .. && hub browse -u -- issues"))
+    endif
+
     let url = substitute(urlIssues, '/issues$', '', '')
     let b:_lilium_repo_url = url
     return url

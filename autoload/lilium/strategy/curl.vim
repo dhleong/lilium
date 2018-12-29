@@ -39,5 +39,11 @@ func! lilium#strategy#curl#create()
         call lilium#job#StartJson(curl, a:Callback)
     endfunc
 
+    func! s.issuesAsync(Callback) dict
+        let curl = s:curlRepo('/issues')
+        echom curl
+        call lilium#job#StartJson(curl, a:Callback)
+    endfunc
+
     return s
 endfunc
