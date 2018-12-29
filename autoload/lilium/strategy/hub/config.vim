@@ -9,14 +9,14 @@ func! lilium#strategy#hub#config#Find() " {{
 endfunc " }}}
 
 func! lilium#strategy#hub#config#GetRepoUrl() " {{
-    let existing = get(b:, '_lily_repo_url', '')
+    let existing = get(b:, '_lilium_repo_url', '')
     if existing != ''
         return existing
     endif
 
     let urlIssues = trim(system("hub browse -u -- issues"))
     let url = substitute(urlIssues, '/issues$', '', '')
-    let b:_lily_repo_url = url
+    let b:_lilium_repo_url = url
     return url
 endfunc " }}}
 
