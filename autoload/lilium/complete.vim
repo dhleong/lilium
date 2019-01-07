@@ -64,7 +64,7 @@ endfunc " }}}
 
 func! s:CloseCompletionMenu() " {{{
     if pumvisible()
-        call s:SendKeys( "\<C-e>" )
+        call s:FeedKeys( "\<C-e>" )
     endif
 endfunc " }}}
 
@@ -110,7 +110,7 @@ endfunc " }}}
 
 func! s:OnTextChangedInsertMode() " {{{
     let prefix = s:FindPrefix()
-    if prefix != ''
+    if prefix !=# ''
         call s:SetYCMEnabled(0)
         call s:TriggerComplete(prefix)
     else
@@ -119,7 +119,7 @@ func! s:OnTextChangedInsertMode() " {{{
 endfunc " }}}
 
 func! s:OnInsertChar() " {{{
-    if v:char == '#' || v:char == '@'
+    if v:char ==# '#' || v:char ==# '@'
         call s:SetYCMEnabled(0)
     endif
 endfunc " }}}

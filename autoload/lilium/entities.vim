@@ -13,11 +13,14 @@ func! lilium#entities#Get(kind)
         return existing
     endif
 
-    echom "TODO fetch " . a:kind . " blocking"
+    echom 'TODO fetch ' . a:kind . ' blocking'
     return []
 endfunc
 
 func! lilium#entities#OnFetch(kind, bufnr, entities)
+    if type(a:entities) != type([])
+        return
+    endif
     let key = s:KeyOf(a:kind)
     let existing = getbufvar(a:bufnr, key, [])
     let new = existing + a:entities

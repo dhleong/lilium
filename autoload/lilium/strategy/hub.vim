@@ -16,7 +16,7 @@ endfunc
 
 func! lilium#strategy#hub#create()
     let config = lilium#strategy#hub#config#Find()
-    if config == ""
+    if config ==# ''
         return 0
     endif
 
@@ -31,7 +31,7 @@ func! lilium#strategy#hub#create()
 
     func! s.issuesAsync(Callback) dict
         let JobCb = function('<SID>processIssues', [a:Callback])
-        call job_start("hub issue -f %I:%t%n", {
+        call job_start('hub issue -f %I:%t%n', {
             \ 'callback': JobCb,
             \ 'out_mode': 'nl',
             \ })

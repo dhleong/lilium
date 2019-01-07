@@ -1,7 +1,7 @@
 
 func! lilium#job#Start(command, Callback)
     let info = {
-        \ 'buffer': "",
+        \ 'buffer': '',
         \ 'command': a:command,
         \ 'onDone': a:Callback
         \ }
@@ -16,7 +16,7 @@ func! lilium#job#Start(command, Callback)
 
     func! info.onExit(channel, code) dict
         if a:code != 0
-            echom "Job `" . self.command . "` exited with: " . a:code
+            echom 'Job `' . self.command . '` exited with: ' . a:code
         endif
     endfunc
 
@@ -32,9 +32,10 @@ func! s:CallDecoded(Callback, encoded)
     let json = json_decode(a:encoded)
     if type(json) == type(v:none) && json == v:none
         " not valid json
-        echom "Bad Json: " . a:encoded
+        echom 'Bad Json: ' . a:encoded
         return
     endif
+    echom string(json)
     call a:Callback(json)
 endfunc
 

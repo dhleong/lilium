@@ -4,13 +4,17 @@
 
 func! s:curl(path)
     let token = lilium#strategy#hub#config#ReadToken()
-    let curl = "curl --silent -H 'Authorization: token " . token . "' "
+    let curl = 'curl --silent -H "Authorization: token ' . token . '" '
     return curl . 'https://api.github.com' . a:path
 endfunc
 
 func! s:curlRepo(path)
     let repo = lilium#strategy#hub#config#GetRepoPath()
     return s:curl('/repos/' . repo . a:path)
+endfunc
+
+func! lilium#strategy#curl#_repo(path)
+    return s:curlRepo(a:path)
 endfunc
 
 func! lilium#strategy#curl#create()
@@ -21,7 +25,7 @@ func! lilium#strategy#curl#create()
 
     " NOTE: we currently only pull the token from the hub config
     let token = lilium#strategy#hub#config#ReadToken()
-    if token == ""
+    if token ==# ''
         return 0
     endif
 

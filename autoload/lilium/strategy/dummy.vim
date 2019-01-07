@@ -8,7 +8,7 @@ endfunc
 
 func! lilium#strategy#dummy#create()
     return {
-        \ 'repo': function("<SID>lambda", [""]),
-        \ 'issuesAsync': function("<SID>lambda", [0])
+        \ 'repo': function('<SID>lambda', ['']),
+        \ 'issuesAsync': function('<SID>lambda', [0])
         \ }
 endfunc

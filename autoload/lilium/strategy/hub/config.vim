@@ -1,22 +1,22 @@
 
 func! lilium#strategy#hub#config#Find() " {{
-    let homeConfig = expand("~/.config") . "/hub"
+    let homeConfig = expand('~/.config') . '/hub'
     if filereadable(homeConfig)
         return homeConfig
     endif
 
-    return ""
+    return ''
 endfunc " }}}
 
 func! lilium#strategy#hub#config#GetRepoUrl() " {{
     let existing = get(b:, '_lilium_repo_url', '')
-    if existing != ''
+    if existing !=# ''
         return existing
     endif
 
-    let urlIssues = trim(system("hub browse -u -- issues"))
-    if urlIssues =~# "^Aborted" && getcwd() =~# "/.git$"
-        let urlIssues = trim(system("cd .. && hub browse -u -- issues"))
+    let urlIssues = trim(system('hub browse -u -- issues'))
+    if urlIssues =~# '^Aborted' && getcwd() =~# '/.git$'
+        let urlIssues = trim(system('cd .. && hub browse -u -- issues'))
     endif
 
     let url = substitute(urlIssues, '/issues$', '', '')
@@ -26,7 +26,7 @@ endfunc " }}}
 
 func! lilium#strategy#hub#config#GetRepoHost() " {{
     let url = lilium#strategy#hub#config#GetRepoUrl()
-    if url == ''
+    if url ==# ''
         return ''
     endif
 
@@ -39,7 +39,7 @@ endfunc " }}}
 
 func! lilium#strategy#hub#config#GetRepoPath() " {{
     let url = lilium#strategy#hub#config#GetRepoUrl()
-    if url == ''
+    if url ==# ''
         return ''
     endif
 
@@ -50,18 +50,18 @@ endfunc " }}}
 
 func! lilium#strategy#hub#config#ReadTokens() " {{
     let file = lilium#strategy#hub#config#Find()
-    if file == ''
+    if file ==# ''
         return ''
     endif
 
     let tokens = {}
     let host = ''
     for line in readfile(file)
-        if line[ len(line) - 1 ] == ':'
+        if line[ len(line) - 1 ] ==# ':'
             let host = line[0:len(line) - 2]
         else
             let parts = split(line, ':')
-            if trim(parts[0]) == 'oauth_token'
+            if trim(parts[0]) ==# 'oauth_token'
                 let tokens[host] = trim(parts[1])
             endif
         endif
@@ -72,7 +72,7 @@ endfunc " }}}
 
 func! lilium#strategy#hub#config#ReadToken() " {{
     let host = lilium#strategy#hub#config#GetRepoHost()
-    if host == ''
+    if host ==# ''
         return ''
     endif
 
