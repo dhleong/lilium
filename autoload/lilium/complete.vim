@@ -157,11 +157,6 @@ endfunc " }}}
 " ======= Public interface ================================
 
 func! lilium#complete#func(findstart, base, ...) " {{{
-    " let repo_dir = lilium#repoDir()
-    " if repo_dir ==# ''
-    "     return a:findstart ? -1 : []
-    " endif
-
     let b:lily_start = a:findstart
     if a:findstart
         let prefix = a:0 ? s:FindPrefix(a:1) : s:FindPrefix()
