@@ -1,11 +1,18 @@
 
 func! lilium#strategy#create() " {{{
-    let curl = lilium#strategy#curl#create()
-    if type(curl) != type(0)
-        return curl
+    " TODO composite strategy
+
+    let ch = lilium#strategy#ch#create()
+    if type(ch) != type(0)
+        return ch
     endif
 
-    " let hub = lilium#strategy#hub#create()
+    let gh = lilium#strategy#gh#create()
+    if type(gh) != type(0)
+        return gh
+    endif
+
+    " let hub = lilium#strategy#gh#hub#create()
 
     " if type(hub) != type(0)
     "     if type(curl) != type(0)
