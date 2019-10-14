@@ -71,12 +71,9 @@ endfunc " }}}
 func! s:GetFilteredCompletionsFor(prefix) " {{{
 
     try
-        let results = lilium#project().getEntitiesForPrefix(a:prefix)
+        let results = lilium#project().completionCandidates(a:prefix)
         let items = get(results, 'items', [])
         let prefix = get(results, 'prefix', a:prefix)
-        let type = get(results, 'type', '')
-        let wordField = get(results, 'wordField', '')
-        let menuField = get(results, 'menuField', '')
         let matchField = get(results, 'matchField', '')
     catch
         echo 'Unable to load completions'
@@ -91,10 +88,7 @@ func! s:GetFilteredCompletionsFor(prefix) " {{{
     let filtered = filter(copy(items),
         \ 'lilium#match#do(v:val, prefix, matchField)')
     return {
-        \ 'type': type,
         \ 'completions': filtered,
-        \ 'wordField': wordField,
-        \ 'menuField': menuField
         \ }
 endfunc " }}}
 
@@ -173,8 +167,8 @@ func! lilium#complete#func(findstart, base, ...) " {{{
     endif
 
     let words = map(result.completions, "{
-        \ 'word': result.type . get(v:val, result.wordField),
-        \ 'menu': empty(result.menuField) ? '' : get(v:val, result.menuField),
+        \ 'word': v:val.word,
+        \ 'menu': get(v:val, 'menu', ''),
         \ 'icase': 1
         \ }")
 

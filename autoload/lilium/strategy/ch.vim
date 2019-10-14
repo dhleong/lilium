@@ -1,39 +1,32 @@
 
-func! s:findPrefix(beforeOnLine) "{{{
-    return matchstr(a:beforeOnLine, '[#@][[:alnum:]-]*$')
+func! lilium#strategy#ch#findPrefix(beforeOnLine) "{{{
+    return matchstr(a:beforeOnLine, '\m\(\[ch\|#\)[[:alnum:]-]*$')
 endfunc "}}}
 
-func! s:getEntitiesForPrefix(prefix) " {{{
-    let wordField = ''
-    let menuField = ''
-    let matchField = ''
-
-    let type = a:prefix[0]
-    let prefix = a:prefix[1:] " trim the # or @
-    if type ==# '#'
-        let items = lilium#entities#Get('issues')
-        let wordField = 'id'
-        let menuField = 'name'
-        let matchField = 'name'
-    endif
-
-    if wordField ==# ''
+func! s:completionCandidates(prefix) " {{{
+    if a:prefix =~# '^\[ch'
+        let prefix = a:prefix[3:] " trim [ch
+    elseif a:prefix =~# '^#'
+        let prefix = a:prefix[1:] " trim #
+    else
         return {}
     endif
 
+    let items = lilium#entities#Get('issues')
+
     return {
-        \ 'type': type,
         \ 'prefix': prefix,
-        \ 'items': items,
-        \ 'wordField': wordField,
-        \ 'menuField': menuField,
-        \ 'matchField': matchField,
+        \ 'items': map(copy(items), "extend(v:val, {
+        \   'word': '[ch' . v:val.id . '](' . v:val.app_url . ')',
+        \   'menu': v:val.name,
+        \ })"),
+        \ 'matchField': 'name',
         \ }
 endfunc " }}}
 
 let s:ch_base = {
-    \ 'findPrefix': function('s:findPrefix'),
-    \ 'getEntitiesForPrefix': function('s:getEntitiesForPrefix'),
+    \ 'findPrefix': function('lilium#strategy#ch#findPrefix'),
+    \ 'completionCandidates': function('s:completionCandidates'),
     \ }
 
 func! lilium#strategy#ch#create()

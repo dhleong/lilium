@@ -1,8 +1,8 @@
-func! s:findPrefix(beforeOnLine) "{{{
+func! lilium#strategy#gh#findPrefix(beforeOnLine) "{{{
     return matchstr(a:beforeOnLine, '[#@][[:alnum:]-]*$')
 endfunc "}}}
 
-func! s:getEntitiesForPrefix(prefix) "{{{
+func! s:completionCandidates(prefix) "{{{
     let wordField = ''
     let menuField = ''
     let matchField = ''
@@ -26,18 +26,18 @@ func! s:getEntitiesForPrefix(prefix) "{{{
     endif
 
     return {
-        \ 'type': type,
         \ 'prefix': prefix,
-        \ 'items': items,
-        \ 'wordField': wordField,
-        \ 'menuField': menuField,
+        \ 'items': map(copy(items), "extend(v:val, {
+        \   'word': type . get(v:val, wordField),
+        \   'menu': get(v:val, menuField, ''),
+        \ })"),
         \ 'matchField': matchField,
         \ }
 endfunc "}}}
 
 let s:gh_base = {
-    \ 'findPrefix': function('s:findPrefix'),
-    \ 'getEntitiesForPrefix': function('s:getEntitiesForPrefix'),
+    \ 'findPrefix': function('lilium#strategy#gh#findPrefix'),
+    \ 'completionCandidates': function('s:completionCandidates'),
     \ }
 
 func! lilium#strategy#gh#create()
