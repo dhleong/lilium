@@ -59,7 +59,7 @@ func! s:FindPrefix(...) " {{{
         let before_on_line = before_on_line . a:1
     endif
 
-    return matchstr(before_on_line, '[#@][[:alnum:]-]*$')
+    return lilium#project().findPrefix(before_on_line)
 endfunc " }}}
 
 func! s:CloseCompletionMenu() " {{{
@@ -69,25 +69,12 @@ func! s:CloseCompletionMenu() " {{{
 endfunc " }}}
 
 func! s:GetFilteredCompletionsFor(prefix) " {{{
-    let type = a:prefix[0]
-    let prefix = a:prefix[1:] " trim the # or @
-    let items = []
-    let wordField = ''
-    let menuField = ''
-    let matchField = ''
 
     try
-        if type ==# '#'
-            " TODO: support cross-repo refs
-            let items = lilium#entities#Get('issues')
-            let wordField = 'number'
-            let menuField = 'title'
-            let matchField = 'title'
-        elseif type ==# '@'
-            let items = lilium#entities#Get('users')
-            let wordField = 'login'
-            let matchField = 'login'
-        endif
+        let results = lilium#project().completionCandidates(a:prefix)
+        let items = get(results, 'items', [])
+        let prefix = get(results, 'prefix', a:prefix)
+        let matchField = get(results, 'matchField', '')
     catch
         echo 'Unable to load completions'
         return {}
@@ -101,10 +88,7 @@ func! s:GetFilteredCompletionsFor(prefix) " {{{
     let filtered = filter(copy(items),
         \ 'lilium#match#do(v:val, prefix, matchField)')
     return {
-        \ 'type': type,
         \ 'completions': filtered,
-        \ 'wordField': wordField,
-        \ 'menuField': menuField
         \ }
 endfunc " }}}
 
@@ -183,8 +167,8 @@ func! lilium#complete#func(findstart, base, ...) " {{{
     endif
 
     let words = map(result.completions, "{
-        \ 'word': result.type . get(v:val, result.wordField),
-        \ 'menu': empty(result.menuField) ? '' : get(v:val, result.menuField),
+        \ 'word': v:val.word,
+        \ 'menu': get(v:val, 'menu', ''),
         \ 'icase': 1
         \ }")
 

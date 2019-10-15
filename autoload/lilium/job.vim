@@ -35,7 +35,6 @@ func! s:CallDecoded(Callback, encoded)
         echom 'Bad Json: ' . a:encoded
         return
     endif
-    echom string(json)
     call a:Callback(json)
 endfunc
 

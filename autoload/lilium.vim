@@ -3,13 +3,24 @@ function! lilium#repoDir() " {{{
 endfunction " }}}
 
 func! lilium#gh() " {{{
-    let existing = get(b:, '_lilium_gh', 0)
+    " NOTE: You should prefer lilium#project() if you don't need a
+    " github-specific instance
+    let gh = lilium#strategy#gh#create()
+    if type(gh) != type(0)
+        return gh
+    endif
+
+    return lilium#strategy#dummy#create()
+endfunc " }}}
+
+func! lilium#project() " {{{
+    let existing = get(b:, '_lilium_project', 0)
     if type(existing) != type(0)
         return existing
     endif
 
     let inst = lilium#strategy#create()
-    let b:_lilium_gh = inst
+    let b:_lilium_project = inst
     return inst
 endfunc " }}}
 
@@ -18,8 +29,8 @@ func! lilium#Enable() " {{{
         return
     endif
 
-    let repo = lilium#gh().repo()
-    if repo ==# ''
+    let p = lilium#project()
+    if !p.exists()
         return
     endif
 

@@ -1,5 +1,5 @@
 "
-" `hub`-based strategy
+" `hub`-based github strategy
 "
 
 func! s:processIssues(Callback, channel, msg)
@@ -8,25 +8,29 @@ func! s:processIssues(Callback, channel, msg)
         return
     endif
 
-    call a:Callback([{
+    call a:Callback('@gh', [{
         \ 'number': parts[0],
         \ 'title': parts[1],
         \ }])
 endfunc
 
-func! lilium#strategy#hub#create()
-    let config = lilium#strategy#hub#config#Find()
+func! lilium#strategy#gh#hub#create()
+    let config = lilium#strategy#gh#hub#config#Find()
     if config ==# ''
         return 0
     endif
 
     let s = {}
+    func! s:exists() dict
+        return self.repo() !=# ''
+    endfunc
+
     func! s.repo() dict
-        return lilium#strategy#hub#config#GetRepoPath()
+        return lilium#strategy#gh#hub#config#GetRepoPath()
     endfunc
 
     func! s.repoUrl() dict
-        return lilium#strategy#hub#config#GetRepoUrl()
+        return lilium#strategy#gh#hub#config#GetRepoUrl()
     endfunc
 
     func! s.issuesAsync(Callback) dict

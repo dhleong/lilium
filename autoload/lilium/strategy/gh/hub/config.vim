@@ -1,5 +1,5 @@
 
-func! lilium#strategy#hub#config#Find() " {{
+func! lilium#strategy#gh#hub#config#Find() " {{
     let homeConfig = expand('~/.config') . '/hub'
     if filereadable(homeConfig)
         return homeConfig
@@ -8,7 +8,7 @@ func! lilium#strategy#hub#config#Find() " {{
     return ''
 endfunc " }}}
 
-func! lilium#strategy#hub#config#GetRepoUrl() " {{
+func! lilium#strategy#gh#hub#config#GetRepoUrl() " {{
     let existing = get(b:, '_lilium_repo_url', '')
     if existing !=# ''
         return existing
@@ -27,8 +27,8 @@ func! lilium#strategy#hub#config#GetRepoUrl() " {{
     return url
 endfunc " }}}
 
-func! lilium#strategy#hub#config#GetRepoHost() " {{
-    let url = lilium#strategy#hub#config#GetRepoUrl()
+func! lilium#strategy#gh#hub#config#GetRepoHost() " {{
+    let url = lilium#strategy#gh#hub#config#GetRepoUrl()
     if url ==# ''
         return ''
     endif
@@ -40,8 +40,8 @@ func! lilium#strategy#hub#config#GetRepoHost() " {{
     return m[1]
 endfunc " }}}
 
-func! lilium#strategy#hub#config#GetRepoPath() " {{
-    let url = lilium#strategy#hub#config#GetRepoUrl()
+func! lilium#strategy#gh#hub#config#GetRepoPath() " {{
+    let url = lilium#strategy#gh#hub#config#GetRepoUrl()
     if url ==# ''
         return ''
     endif
@@ -51,8 +51,8 @@ func! lilium#strategy#hub#config#GetRepoPath() " {{
 endfunc " }}}
 
 
-func! lilium#strategy#hub#config#ReadTokens() " {{
-    let file = lilium#strategy#hub#config#Find()
+func! lilium#strategy#gh#hub#config#ReadTokens() " {{
+    let file = lilium#strategy#gh#hub#config#Find()
     if file ==# ''
         return ''
     endif
@@ -73,12 +73,12 @@ func! lilium#strategy#hub#config#ReadTokens() " {{
     return tokens
 endfunc " }}}
 
-func! lilium#strategy#hub#config#ReadToken() " {{
-    let host = lilium#strategy#hub#config#GetRepoHost()
+func! lilium#strategy#gh#hub#config#ReadToken() " {{
+    let host = lilium#strategy#gh#hub#config#GetRepoHost()
     if host ==# ''
         return ''
     endif
 
-    let tokens = lilium#strategy#hub#config#ReadTokens()
+    let tokens = lilium#strategy#gh#hub#config#ReadTokens()
     return get(tokens, host, '')
 endfunc " }}}

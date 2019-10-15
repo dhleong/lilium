@@ -1,0 +1,12 @@
+"
+" =========================================================
+"
+
+Execute (FindPrefix should find '[ch'):
+  AssertEqual '[ch', lilium#strategy#ch#findPrefix('[ch')
+  AssertEqual '[chmrey', lilium#strategy#ch#findPrefix('That is [chmrey')
+
+Execute (FindPrefix should find '#'):
+  AssertEqual '#', lilium#strategy#ch#findPrefix('#')
+  AssertEqual '#mrey', lilium#strategy#ch#findPrefix('That is #mrey')
+

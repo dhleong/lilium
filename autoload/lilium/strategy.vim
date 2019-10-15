@@ -1,19 +1,13 @@
 
 func! lilium#strategy#create() " {{{
-    let curl = lilium#strategy#curl#create()
-    if type(curl) != type(0)
-        return curl
+    let composite = lilium#strategy#composite#create([
+        \ lilium#strategy#ch#create(),
+        \ lilium#strategy#gh#create(),
+        \ ])
+
+    if type(composite) != type(0)
+        return composite
     endif
-
-    " let hub = lilium#strategy#hub#create()
-
-    " if type(hub) != type(0)
-    "     if type(curl) != type(0)
-    "         let hub.usersAsync = curl.usersAsync
-    "     endif
-    "
-    "     return hub
-    " endif
 
     return lilium#strategy#dummy#create()
 endfunc " }}}
