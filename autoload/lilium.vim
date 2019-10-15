@@ -3,8 +3,8 @@ function! lilium#repoDir() " {{{
 endfunction " }}}
 
 func! lilium#gh() " {{{
-    " DEPRECATED: prefer lilium#project() if you don't need
-    " a github-specific instance
+    " NOTE: You should prefer lilium#project() if you don't need a
+    " github-specific instance
     let gh = lilium#strategy#gh#create()
     if type(gh) != type(0)
         return gh
@@ -30,9 +30,6 @@ func! lilium#Enable() " {{{
     endif
 
     let p = lilium#project()
-    if !has_key(p, 'exists')
-        echom p
-    endif
     if !p.exists()
         return
     endif
