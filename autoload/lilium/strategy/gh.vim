@@ -11,12 +11,12 @@ func! s:completionCandidates(prefix) "{{{
     let prefix = a:prefix[1:] " trim the # or @
     if type ==# '#'
         " TODO: support cross-repo refs
-        let items = lilium#entities#Get('issues')
+        let items = lilium#entities#Get('issues', '@gh')
         let wordField = 'number'
         let menuField = 'title'
         let matchField = 'title'
     elseif type ==# '@'
-        let items = lilium#entities#Get('users')
+        let items = lilium#entities#Get('users', '@gh')
         let wordField = 'login'
         let matchField = 'login'
     endif

@@ -44,12 +44,12 @@ func! lilium#strategy#gh#curl#create()
 
     func! s.usersAsync(Callback) dict
         let curl = s:curlRepo('/contributors')
-        call lilium#job#StartJson(curl, a:Callback)
+        call lilium#job#StartJson(curl, function(a:Callback, ['@gh']))
     endfunc
 
     func! s.issuesAsync(Callback) dict
         let curl = s:curlRepo('/issues')
-        call lilium#job#StartJson(curl, a:Callback)
+        call lilium#job#StartJson(curl, function(a:Callback, ['@gh']))
     endfunc
 
     return s

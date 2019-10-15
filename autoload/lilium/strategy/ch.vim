@@ -12,7 +12,7 @@ func! s:completionCandidates(prefix) " {{{
         return {}
     endif
 
-    let items = lilium#entities#Get('issues')
+    let items = lilium#entities#Get('issues', '@ch')
 
     return {
         \ 'prefix': prefix,

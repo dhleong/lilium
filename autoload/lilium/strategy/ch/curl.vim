@@ -12,7 +12,7 @@ func s:readConfig()
 endfunc
 
 func! s:unpack(Callback, json)
-    call a:Callback(a:json.data)
+    call a:Callback('@ch', a:json.data)
 endfunc
 
 " ======= project impl ====================================
@@ -40,6 +40,7 @@ func s:ch_repoUrl() dict
 endfunc
 
 func s:ch_usersAsync(Callback) dict
+    call a:Callback('@ch', [])
 endfunc
 
 func s:ch_issuesAsync(Callback) dict

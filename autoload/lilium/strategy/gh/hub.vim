@@ -8,7 +8,7 @@ func! s:processIssues(Callback, channel, msg)
         return
     endif
 
-    call a:Callback([{
+    call a:Callback('@gh', [{
         \ 'number': parts[0],
         \ 'title': parts[1],
         \ }])
