@@ -46,7 +46,7 @@ endfunc
 func s:ch_issuesAsync(Callback) dict
     let curl = self._curl('/search/stories', {
         \ 'page_size': 25,
-        \ 'query': get(self._config, 'storiesQuery', ''),
+        \ 'query': get(self._config, 'storiesQuery', 'is:story'),
         \ })
     call lilium#job#StartJson(curl, function('s:unpack', [a:Callback]))
 endfunc
