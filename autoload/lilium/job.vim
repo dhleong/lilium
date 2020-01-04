@@ -2,6 +2,7 @@
 func! lilium#job#Start(command, Callback)
     let info = {
         \ 'buffer': '',
+        \ 'errored': 0,
         \ 'command': a:command,
         \ 'onDone': a:Callback
         \ }
@@ -11,19 +12,21 @@ func! lilium#job#Start(command, Callback)
     endfunc
 
     func! info.onClose(channel) dict
-        call self.onDone(self.buffer)
+        if !self.errored
+            call self.onDone(self.buffer)
+        endif
     endfunc
 
     func! info.onExit(channel, code) dict
         if a:code != 0
-            echom 'Job `' . self.command . '` exited with: ' . a:code
+            let self.errored = 1
+            echom 'Job `' . string(self.command) . '` exited with: ' . a:code
         endif
     endfunc
 
     return job_start(a:command, {
         \ 'out_cb': info.onOutput,
         \ 'out_mode': 'raw',
-        \ 'close_cb': info.onClose,
         \ 'exit_cb': info.onExit,
         \ })
 endfunc
