@@ -27,6 +27,7 @@ func! lilium#job#Start(command, Callback)
     return job_start(a:command, {
         \ 'out_cb': info.onOutput,
         \ 'out_mode': 'raw',
+        \ 'close_cb': info.onClose,
         \ 'exit_cb': info.onExit,
         \ })
 endfunc
