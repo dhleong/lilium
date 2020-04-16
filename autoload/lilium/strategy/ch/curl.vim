@@ -3,7 +3,7 @@
 "
 
 func s:readConfig()
-    let path = findfile('.lilium.clubhouse.json')
+    let path = findfile('./.lilium.clubhouse.json')
     if path ==# '' || !filereadable(path)
         return {}
     endif
