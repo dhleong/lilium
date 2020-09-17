@@ -1,4 +1,4 @@
-" TempScript borrowed from fugitive:
+" TempScript borrowed from fugitive: {{{
 if !exists('s:temp_scripts')
   let s:temp_scripts = {}
 endif
@@ -11,7 +11,7 @@ func! s:TempScript(...)
         let s:temp_scripts[body] = temp
     endif
     return s:temp_scripts[body]
-endfunc
+endfunc " }}}
 
 func! s:RestoreTerm(state) " {{{
     call writefile([], a:state.temp . '.exit')
