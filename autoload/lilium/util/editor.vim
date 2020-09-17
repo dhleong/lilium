@@ -1,12 +1,16 @@
-" TempScript borrowed from fugitive: {{{
+" TempScript based on the same from fugitive: {{{
 if !exists('s:temp_scripts')
-  let s:temp_scripts = {}
+    let s:temp_scripts = {}
 endif
 
 func! s:TempScript(...)
     let body = join(a:000, "\n")
     if !has_key(s:temp_scripts, body)
-        let temp = tempname() . '.vim'
+        " the script name is visible in gh, so let's make it look like "vim"
+        let scriptDir = tempname()
+        call mkdir(scriptDir, 'p')
+        let temp = scriptDir . '/vim'
+
         call writefile(['#!/bin/sh'] + a:000, temp)
         let s:temp_scripts[body] = temp
     endif
