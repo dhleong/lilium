@@ -46,6 +46,7 @@ func! lilium#util#editor#OnEdit(bufnr, args) " {{{
     exe 'edit ' . path
 
     if state.enhanced
+        let b:_lilium_project = state.project
         call lilium#Enable()
     endif
 
@@ -59,6 +60,7 @@ endfunc " }}}
 
 func! lilium#util#editor#Run(cmd, ...) " {{{
     let config = a:0 ? a:1 : {}
+    let project = lilium#project()
 
     let callback = ["call", "lilium#util#editor#OnEdit", ["$1"]]
     let editor = 'sh ' . s:TempScript(
@@ -69,6 +71,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
           \ 'exit 0')
 
     let state = extend(config, {
+        \ 'project': project,
         \ 'temp': tempname(),
         \ })
 
