@@ -26,11 +26,11 @@ func! lilium#strategy#gh#hub#create()
     endfunc
 
     func! s.repo() dict
-        return lilium#strategy#gh#hub#config#GetRepoPath()
+        return lilium#strategy#gh#hub#config#GetRepoPath(self)
     endfunc
 
     func! s.repoUrl() dict
-        return lilium#strategy#gh#hub#config#GetRepoUrl()
+        return lilium#strategy#gh#hub#config#GetRepoUrl(self)
     endfunc
 
     func! s.issuesAsync(Callback) dict

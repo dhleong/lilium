@@ -8,8 +8,8 @@ func! lilium#strategy#gh#hub#config#Find() " {{
     return ''
 endfunc " }}}
 
-func! lilium#strategy#gh#hub#config#GetRepoUrl() " {{
-    let existing = get(b:, '_lilium_repo_url', '')
+func! lilium#strategy#gh#hub#config#GetRepoUrl(state) " {{
+    let existing = get(a:state, '_lilium_repo_url', '')
     if existing !=# ''
         return existing
     endif
@@ -23,12 +23,12 @@ func! lilium#strategy#gh#hub#config#GetRepoUrl() " {{
     endif
 
     let url = substitute(urlIssues, '/issues$', '', '')
-    let b:_lilium_repo_url = url
+    let a:state._lilium_repo_url = url
     return url
 endfunc " }}}
 
-func! lilium#strategy#gh#hub#config#GetRepoHost() " {{
-    let url = lilium#strategy#gh#hub#config#GetRepoUrl()
+func! lilium#strategy#gh#hub#config#GetRepoHost(state) " {{
+    let url = lilium#strategy#gh#hub#config#GetRepoUrl(a:state)
     if url ==# ''
         return ''
     endif
@@ -40,8 +40,8 @@ func! lilium#strategy#gh#hub#config#GetRepoHost() " {{
     return m[1]
 endfunc " }}}
 
-func! lilium#strategy#gh#hub#config#GetRepoPath() " {{
-    let url = lilium#strategy#gh#hub#config#GetRepoUrl()
+func! lilium#strategy#gh#hub#config#GetRepoPath(state) " {{
+    let url = lilium#strategy#gh#hub#config#GetRepoUrl(a:state)
     if url ==# ''
         return ''
     endif
@@ -73,8 +73,8 @@ func! lilium#strategy#gh#hub#config#ReadTokens() " {{
     return tokens
 endfunc " }}}
 
-func! lilium#strategy#gh#hub#config#ReadToken() " {{
-    let host = lilium#strategy#gh#hub#config#GetRepoHost()
+func! lilium#strategy#gh#hub#config#ReadToken(state) " {{
+    let host = lilium#strategy#gh#hub#config#GetRepoHost(a:state)
     if host ==# ''
         return ''
     endif
