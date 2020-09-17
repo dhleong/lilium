@@ -40,7 +40,7 @@ func! s:FinishEditing(editorBufnr, termBufnr) " {{{
     call timer_start(10, { -> s:RestoreTerm(state) })
 endfunc " }}}
 
-func! lilium#util#editor#OnEdit(bufnr, args) " {{{
+func! s:OnEdit(bufnr, args) " {{{
     let [path] = a:args
     let g:lilium_editing = path
     let state = getbufvar(a:bufnr, 'lilium_editor_state')
@@ -66,7 +66,9 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
     let config = a:0 ? a:1 : {}
     let project = lilium#project()
 
-    let callback = ["call", "lilium#util#editor#OnEdit", ["$1"]]
+    let sid = expand('<SID>')
+
+    let callback = ["call",  sid . "OnEdit", ["$1"]]
     let editor = 'sh ' . s:TempScript(
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
@@ -84,11 +86,9 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
         \ 'LILIUM_TEMP': state.temp,
         \ }
 
-    let opts = {
+    let bufnr = term_start(a:cmd, {
         \ 'env': env,
-        \ 'term_api': 'lilium#util#editor#',
-        \ }
-
-    let bufnr = term_start(a:cmd, opts)
+        \ 'term_api': sid,
+        \ })
     call setbufvar(bufnr, 'lilium_editor_state', state)
 endfunc " }}}
