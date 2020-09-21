@@ -18,11 +18,11 @@ func! s:TempScript(...)
 endfunc " }}}
 
 func! s:RestoreTerm(state) " {{{
-    call writefile([], a:state.temp . '.exit')
-
     exe a:state.windowSize .'split'
     exe 'buffer ' . a:state.termBufnr
     startinsert
+
+    call writefile([], a:state.temp . '.exit')
 endfunc " }}}
 
 func! s:FinishEditing(editorBufnr, termBufnr) " {{{
@@ -73,7 +73,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
           \ 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"',
-          \ 'while [ -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
+          \ 'while [ ! -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
           \ 'exit 0')
 
     let state = extend(config, {
