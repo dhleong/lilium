@@ -68,12 +68,13 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
 
     let sid = expand('<SID>')
 
-    let callback = ["call",  sid . "OnEdit", ["$1"]]
+    let callback = ["call",  sid . "OnEdit", ["$editing"]]
     let editor = 'sh ' . s:TempScript(
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
-          \ 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"',
           \ 'while [ ! -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
+          \ 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"',
+          \ 'while [ -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
           \ 'exit 0')
 
     let state = extend(config, {
