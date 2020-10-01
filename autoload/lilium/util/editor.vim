@@ -95,4 +95,9 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
         \ 'term_api': sid,
         \ })
     call setbufvar(bufnr, 'lilium_editor_state', state)
+
+    if bufnr != 0
+        nnoremap <buffer> <silent> gq :q<cr>
+        nnoremap <buffer> <silent> q :q<cr>
+    endif
 endfunc " }}}
