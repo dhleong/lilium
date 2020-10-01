@@ -3,6 +3,10 @@ if !exists('s:temp_scripts')
     let s:temp_scripts = {}
 endif
 
+func lilium#util#editor#Test()
+    echo s:temp_scripts
+endfunc
+
 func! s:TempScript(...)
     let body = join(a:000, "\n")
     if !has_key(s:temp_scripts, body)
@@ -65,7 +69,6 @@ endfunc " }}}
 func! lilium#util#editor#Run(cmd, ...) " {{{
     let config = a:0 ? a:1 : {}
     let project = lilium#project()
-
     let sid = expand('<SID>')
 
     let callback = ["call",  sid . "OnEdit", ["$editing"]]
@@ -74,7 +77,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
           \ 'editing="$1"',
           \ 'while [ ! -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
           \ 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"',
-          \ 'while [ -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
+          \ 'while [ ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
           \ 'exit 0')
 
     let state = extend(config, {
