@@ -13,10 +13,12 @@ func! s:TempScript(...)
         " the script name is visible in gh, so let's make it look like "vim"
         let scriptDir = tempname()
         call mkdir(scriptDir, 'p')
-        let temp = scriptDir . '/vim'
+        let s:temp_scripts[body] = scriptDir . '/vim'
+    endif
 
+    let temp = s:temp_scripts[body]
+    if !filereadable(temp)
         call writefile(['#!/bin/sh'] + a:000, temp)
-        let s:temp_scripts[body] = temp
     endif
     return s:temp_scripts[body]
 endfunc " }}}
