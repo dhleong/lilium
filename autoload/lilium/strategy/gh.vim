@@ -1,5 +1,5 @@
 func! lilium#strategy#gh#findPrefix(beforeOnLine) "{{{
-    return matchstr(a:beforeOnLine, '[#@][[:alnum:]-]*$')
+    return matchstr(a:beforeOnLine, '\m[#@][[:alnum:]-]*$')
 endfunc "}}}
 
 func! s:completionCandidates(prefix) "{{{

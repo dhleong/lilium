@@ -1,6 +1,7 @@
 
 func! lilium#strategy#create() " {{{
     let composite = lilium#strategy#composite#create([
+        \ lilium#strategy#asana#create(),
         \ lilium#strategy#ch#create(),
         \ lilium#strategy#gh#create(),
         \ ])
