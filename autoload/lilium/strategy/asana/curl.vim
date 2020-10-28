@@ -3,10 +3,15 @@
 "
 
 func s:readConfig()
-    let path = findfile('.lilium.asana.json')
+    let path = findfile('./.lilium.asana.json')
+    if path ==# '' || !filereadable(path)
+        " take two:
+        let path = findfile('../.lilium.asana.json')
+    endif
     if path ==# '' || !filereadable(path)
         return {}
     endif
+
     let contents = readfile(path)
     return json_decode(join(contents))
 endfunc
