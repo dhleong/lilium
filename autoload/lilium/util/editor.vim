@@ -73,7 +73,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
     let project = lilium#project()
     let sid = expand('<SID>')
 
-    let callback = ["call",  sid . "OnEdit", ["$editing"]]
+    let callback = ['call',  sid . 'OnEdit', ['$editing']]
     let editor = 'sh ' . s:TempScript(
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
