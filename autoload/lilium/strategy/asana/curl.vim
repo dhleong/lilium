@@ -3,11 +3,7 @@
 "
 
 func s:readConfig()
-    let path = findfile('./.lilium.asana.json')
-    if path ==# '' || !filereadable(path)
-        " take two:
-        let path = findfile('../.lilium.asana.json')
-    endif
+    let path = lilium#config#FindFile('.lilium.asana.json')
     if path ==# '' || !filereadable(path)
         return {}
     endif
@@ -17,7 +13,11 @@ func s:readConfig()
 endfunc
 
 func! s:unpack(Callback, json)
-    call a:Callback('@asana', a:json.data)
+    if has_key(a:json, 'data')
+        call a:Callback('@asana', a:json.data)
+    else
+        echom "Error:" . string(a:json)
+    endif
 endfunc
 
 " ======= project impl ====================================

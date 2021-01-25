@@ -3,8 +3,8 @@
 "
 
 func s:readConfig()
-    let path = findfile('./.lilium.clubhouse.json')
-    if path ==# '' || !filereadable(path)
+    let path = lilium#config#FindFile('.lilium.clubhouse.json')
+    if path ==# ''
         return {}
     endif
     let contents = readfile(path)
