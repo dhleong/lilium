@@ -178,15 +178,17 @@ endfunc " }}}
 func! lilium#complete#Enable() " {{{
     setlocal omnifunc=lilium#complete#func
 
-    " We need menuone in completeopt, otherwise when there's only one candidate
-    " for completion, the menu doesn't show up.
-    set completeopt-=menu
-    set completeopt+=menuone
+    if stridx(&completeopt, 'menuone') == -1
+        " We need menuone in completeopt, otherwise when there's only one candidate
+        " for completion, the menu doesn't show up.
+        setlocal completeopt-=menu
+        setlocal completeopt+=menuone
+    endif
 
     augroup liliumcursormoved
         autocmd!
         autocmd TextChangedI <buffer> call s:OnTextChangedInsertMode()
         autocmd InsertCharPre <buffer> call s:OnInsertChar()
-        autocmd InsertLeave * call s:SetYCMEnabled(1)
+        autocmd InsertLeave <buffer> call s:SetYCMEnabled(1)
     augroup END
 endfunc " }}}
