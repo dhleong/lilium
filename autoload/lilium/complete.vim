@@ -5,6 +5,10 @@ func! s:HasYCM() " {{{
     return exists('#youcompleteme')
 endfunc " }}}
 
+func! s:HasCOC() " {{{
+    return exists('#coc_nvim')
+endfunc " }}}
+
 let s:ycmEnabled = 1
 func! s:SetYCMEnabled(isEnabled) " {{{
     if !s:HasYCM()
@@ -172,7 +176,14 @@ func! lilium#complete#func(findstart, base, ...) " {{{
         \ 'icase': 1
         \ }")
 
-    return {'words': words, 'refresh': 'always'}
+    if s:HasCOC()
+        " For some reason, specifying refresh:always causes COC to freak out
+        " and be permanently poisoned *forever*, such that if you type a
+        " letter that doesn't match a suggestion, it deletes that letter.
+        return {'words': words}
+    else
+        return {'words': words, 'refresh': 'always'}
+    endif
 endfunc " }}}
 
 func! lilium#complete#Enable() " {{{
