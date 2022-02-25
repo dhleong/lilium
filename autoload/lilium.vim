@@ -34,9 +34,10 @@ func! lilium#Enable() " {{{
         return
     endif
 
-    call lilium#complete#Enable()
-
-    call lilium#entities#PrefetchAll()
+    if !has('nvim')
+        call lilium#complete#Enable()
+        call lilium#entities#PrefetchAll()
+    endif
 
     let b:_lilium_init = 1
 endfunc " }}}
