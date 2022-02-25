@@ -8,8 +8,10 @@ local COMPLETION = methods.internal.COMPLETION
 local function create_item(ticket)
   return {
     insertText = ticket.ref,
-    kind = vim.lsp.protocol.CompletionItemKind["Text"],
+    kind = vim.lsp.protocol.CompletionItemKind.Text,
     label = ticket.title,
+
+    textEdit = ticket.textEdit,
   }
 end
 
@@ -25,14 +27,14 @@ return h.make_builtin{
 
         if source then
           a.util.scheduler()
-          local completions = source:gather_completions(params)
 
-          for i, v in ipairs(completions) do
-            items[i] = create_item(v)
+          local completions = source:gather_completions(params)
+          if completions then
+            items = vim.tbl_map(create_item, completions)
           end
         end
 
-        done{ { items = items, isIncomplete = false } }
+        done{ { items = items, isIncomplete = #items == 0 } }
       end)
     end,
     async = true,

@@ -1,11 +1,13 @@
+local PrefixedSource = require'lilium.completion.sources.prefixed'
+
 ---@alias Ticket {title:string, ref:string}
 
 local M = {}
 
 ---@return CompletionSource|nil
 function M.create_source(params)
-  -- TODO
-  return require'lilium.completion.sources.dummy'.create(params)
+  local asana = require'lilium.completion.sources.asana'.create(params)
+  return PrefixedSource:new({'#', '@'}, asana)
 end
 
 ---@return CompletionSource|nil
