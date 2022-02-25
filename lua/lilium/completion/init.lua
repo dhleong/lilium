@@ -2,13 +2,13 @@
 
 local M = {}
 
----@return CompletionSource
-function M.create_source(_)
+---@return CompletionSource|nil
+function M.create_source(params)
   -- TODO
-  return require'lilium.completion.sources.dummy'
+  return require'lilium.completion.sources.dummy'.create(params)
 end
 
----@return CompletionSource
+---@return CompletionSource|nil
 function M.get_source(params)
   -- TODO cache sources
   return M.create_source(params)

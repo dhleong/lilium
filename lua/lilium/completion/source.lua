@@ -1,9 +1,17 @@
+---@alias Params {}
+
 ---@class CompletionSource
-local M = {}
+local CompletionSource = {}
 
 ---@return Ticket[]
-function M:gather_completions(_)
+function CompletionSource:gather_completions(_)
   return {}
 end
 
-return M
+---@class CompletionSourceFactory
+local CompletionSourceFactory = {}
+
+---@param _ Params
+---@return CompletionSource|nil
+function CompletionSourceFactory.create(_)
+end

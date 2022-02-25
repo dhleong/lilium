@@ -1,10 +1,18 @@
 ---@class DummySource : CompletionSource
-local M = {}
+local DummySource = {}
 
-function M:gather_completions(_)
+function DummySource:gather_completions(_)
   return {
     { title = 'Fancy Tix', ref = 'https://asana.com/1234' },
   }
+end
+
+
+---@class DummySourceFactory : CompletionSourceFactory
+local M = {}
+
+function M.create(_)
+  return DummySource
 end
 
 return M

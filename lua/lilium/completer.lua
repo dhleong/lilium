@@ -18,12 +18,15 @@ return h.make_builtin{
   filetypes = { 'gitcommit' },
   generator = {
     fn = function(params, done)
-      local source = require'lilium.completion'.get_source(params)
-      local completions = source:gather_completions(params)
-
       local items = {}
-      for i, v in ipairs(completions) do
-        items[i] = create_item(v)
+      local source = require'lilium.completion'.get_source(params)
+
+      if source then
+        local completions = source:gather_completions(params)
+
+        for i, v in ipairs(completions) do
+          items[i] = create_item(v)
+        end
       end
 
       done{ { items = items, isIncomplete = false } }
