@@ -37,6 +37,8 @@ func! lilium#Enable() " {{{
     if !has('nvim')
         call lilium#complete#Enable()
         call lilium#entities#PrefetchAll()
+    else
+        lua require'lilium'.maybe_init_completion()
     endif
 
     let b:_lilium_init = 1
