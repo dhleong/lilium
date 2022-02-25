@@ -1,4 +1,4 @@
----@alias Params {}
+---@alias Params {bufnr:number, bufname:string}
 
 ---@class CompletionSource
 local CompletionSource = {}
