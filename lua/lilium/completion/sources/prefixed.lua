@@ -20,7 +20,11 @@ function PrefixedSource:_handle_prefix(params, tickets)
   return vim.tbl_map(function (ticket)
     -- If the replacement doesn't include the prefix, delete the prefix!
     local replacement = ticket.ref or ticket.title
-    if params.prefix and string.sub(replacement, 1, #params.prefix) ~= params.prefix then
+
+    if params.prefix and
+      string.sub(replacement, 1, #params.prefix) ~= params.prefix and
+      #params.word_to_complete == 0
+    then
       ticket.textEdit = {
         range = {
           start = {
@@ -29,7 +33,7 @@ function PrefixedSource:_handle_prefix(params, tickets)
           },
           ['end'] = {
             line = params.row - 1,
-            character = params.col - 1,
+            character = params.col,
           },
         },
         newText = replacement,
