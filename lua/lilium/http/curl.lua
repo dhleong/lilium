@@ -1,15 +1,13 @@
-local loop = require'null-ls.loop'
 local a = require'plenary.async'
+
+local command = require'lilium.command'
 
 ---@alias Req {url:string, params:{}, headers:{}, json:boolean}
 
 local M = {}
 
 ---@param req Req
-M.get = a.wrap(function (req, done)
-  -- TODO: Plenary's Job causes eslint_d to hang for some reason...
-  -- so we use null-ls's job spawning for now.
-
+function M.get(req)
   local args = {
     '--silent', '-X', 'GET',
     '-L', req.url,
@@ -35,12 +33,11 @@ M.get = a.wrap(function (req, done)
     end
   end
 
-  loop.spawn('curl', args, {
-    handler = a.void(function (_, stdout)
-      done(stdout)
-    end),
-  })
-end, 2)
+  return command.exec {
+    command = 'curl',
+    args = args,
+  }
+end
 
 ---@param req Req
 function M.get_json(req)
