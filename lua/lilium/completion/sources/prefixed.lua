@@ -18,13 +18,19 @@ function PrefixedSource:_handle_prefix(params, tickets)
   end
 
   return vim.tbl_map(function (ticket)
-    -- If the replacement doesn't include the prefix, delete the prefix!
     local replacement = ticket.ref or ticket.title
+    local starts_with_prefix = params.prefix and
+      string.sub(replacement, 1, #params.prefix) == params.prefix
 
-    if params.prefix and
-      string.sub(replacement, 1, #params.prefix) ~= params.prefix and
+    if starts_with_prefix then
+      -- Remove the prefix so completion works cleanly
+      ticket.ref = string.sub(replacement, 1 + #params.prefix)
+
+    elseif params.prefix and
+      not starts_with_prefix and
       #params.word_to_complete == 0
     then
+      -- If the replacement doesn't include the prefix, delete the prefix!
       ticket.textEdit = {
         range = {
           start = {

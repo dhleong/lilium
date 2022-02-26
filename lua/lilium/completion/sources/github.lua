@@ -1,3 +1,4 @@
+local a = require'plenary.async'
 local command = require'lilium.command'
 
 local function format_issue(issue)
@@ -20,18 +21,29 @@ function GithubSource:new(config)
   return obj
 end
 
+function GithubSource:_list(type)
+  local output = command.exec_json {
+    command = 'gh',
+    args = { type, 'list', '--json', 'number,title' },
+    cwd = self.config.cwd,
+  }
+  return output or {}
+end
+
 function GithubSource:gather_completions(params)
-  local cwd = vim.fn.expand('#' .. params.bufnr .. ':h')
   if params.prefix == '#' then
-    -- TODO
-    local output = command.exec_json {
-      command = 'gh',
-      args = { 'issue', 'list', '--json', 'number,title' },
-      cwd = cwd,
+    local results = a.util.join {
+      function() return self:_list('issue') end,
+      function() return self:_list('pr') end,
     }
-    if output then
-      return vim.tbl_map(format_issue, output)
+
+    local output = {}
+    for _, result_set in ipairs(results) do
+      -- It's unclear why but each result_set is wrapped in another list
+      vim.list_extend(output, result_set[1])
     end
+
+    return vim.tbl_map(format_issue, output)
   end
 end
 
@@ -40,14 +52,15 @@ local M = {}
 
 ---@param params Params
 function M.create(params)
+  local cwd = vim.fn.expand('#' .. params.bufnr .. ':p:h')
   local repo_url = command.exec {
     command = 'gh',
     args = { 'browse', '--no-browser' },
-    cwd = params.bufname,
+    cwd = cwd,
   }
 
   if repo_url then
-    return GithubSource:new {}
+    return GithubSource:new { cwd = cwd }
   end
 end
 
