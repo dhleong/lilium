@@ -18,6 +18,11 @@ end, 2)
 ---@param bufnr number
 ---@param filename string
 function M.find_config(bufnr, filename)
+  if not bufnr then
+    print('[error] missing bufnr; filename=', filename)
+    return
+  end
+
   local path = Path:new(vim.fn.fnamemodify('#' .. bufnr, ':p:h'))
   for _, parent in ipairs(path:parents()) do
     local read = M.read_path(Path:new(parent) / filename)

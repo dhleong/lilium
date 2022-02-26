@@ -58,7 +58,9 @@ function AsanaSource:gather_completions(params)
 end
 
 ---@class AsanaSourceFactory : CompletionSourceFactory
-local M = {}
+local M = {
+  name = 'asana',
+}
 
 ---@param params Params
 function M.create(params)
