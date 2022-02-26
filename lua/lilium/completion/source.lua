@@ -1,4 +1,5 @@
 ---@alias Params {bufnr:number, bufname:string}
+---@alias Ticket {title:string, ref:string}
 
 ---@class CompletionSource
 local CompletionSource = {}

@@ -6,8 +6,6 @@ local source_modules = {
   'lilium.completion.sources.github',
 }
 
----@alias Ticket {title:string, ref:string}
-
 local M = {}
 
 ---@return CompletionSource|nil
