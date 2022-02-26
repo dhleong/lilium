@@ -60,8 +60,6 @@ end
 ---@class AsanaSourceFactory : CompletionSourceFactory
 local M = {}
 
-M.AsanaSource = AsanaSource
-
 ---@param params Params
 function M.create(params)
   local config = fs.find_json(params.bufnr, asana_config_filename)
