@@ -3,22 +3,29 @@ if !exists('s:temp_scripts')
     let s:temp_scripts = {}
 endif
 
-func lilium#util#editor#Test()
-    echo s:temp_scripts
-endfunc
+if !exists('s:editor_name')
+    if has('nvim')
+        let s:editor_name = 'nvim'
+    else
+        let s:editor_name = 'vim'
+    endif
+endif
 
 func! s:TempScript(...)
-    let body = join(a:000, "\n")
+    let lines = flatten(copy(a:000))
+    let body = join(lines, "\n")
+    let g:body_args = lines
+
     if !has_key(s:temp_scripts, body)
         " the script name is visible in gh, so let's make it look like "vim"
         let scriptDir = tempname()
         call mkdir(scriptDir, 'p')
-        let s:temp_scripts[body] = scriptDir . '/vim'
+        let s:temp_scripts[body] = scriptDir . '/' . s:editor_name
     endif
 
     let temp = s:temp_scripts[body]
     if !filereadable(temp)
-        call writefile(['#!/bin/sh'] + a:000, temp)
+        call writefile(['#!/bin/sh'] + lines, temp)
     endif
     return s:temp_scripts[body]
 endfunc " }}}
@@ -68,17 +75,44 @@ func! s:OnEdit(bufnr, args) " {{{
     augroup END
 endfunc " }}}
 
+func! s:CreateOnEditScriptVim(sid)
+    let callback = ['call',  a:sid . 'OnEdit', ['$editing']]
+    return 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"'
+endfunc
+
+func! s:CreateOnEditScriptNeovim(bufnr, sid)
+    return [
+        \ 'nvim -u NONE -i NONE -es << EOF',
+        \ "let sock = sockconnect('pipe', '$NVIM_LISTEN_ADDRESS', { 'rpc': 1 })",
+        \ "call rpcrequest(sock, 'nvim_exec', " .
+        \   "'call " . a:sid . 'OnEdit(' . a:bufnr . ", [\"$editing\"])'," .
+        \   '0)',
+        \ 'call chanclose(sock)',
+        \ 'EOF',
+        \ ]
+endfunc
+
 func! lilium#util#editor#Run(cmd, ...) " {{{
     let config = a:0 ? a:1 : {}
     let project = lilium#project()
     let sid = expand('<SID>')
+    let bufnr = 0
 
-    let callback = ['call',  sid . 'OnEdit', ['$editing']]
+    let onEditScript = ''
+    if has('nvim')
+        split
+        enew
+        let bufnr = bufnr('%')
+        let onEditScript = s:CreateOnEditScriptNeovim(bufnr, sid)
+    else
+        let onEditScript = s:CreateOnEditScriptVim(sid)
+    endif
+
     let editor = 'sh ' . s:TempScript(
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
           \ 'while [ ! -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
-          \ 'printf "\033]51;' . escape(json_encode(callback), '"') . '\007"',
+          \ onEditScript,
           \ 'while [ ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
           \ 'exit 0')
 
@@ -92,10 +126,15 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
         \ 'LILIUM_TEMP': state.temp,
         \ }
 
-    let bufnr = term_start(a:cmd, {
-        \ 'env': env,
-        \ 'term_api': sid,
-        \ })
+    if has('nvim')
+        call termopen(a:cmd, { 'env': env })
+        startinsert
+    else
+        let bufnr = term_start(a:cmd, {
+            \ 'env': env,
+            \ 'term_api': sid,
+            \ })
+    endif
     call setbufvar(bufnr, 'lilium_editor_state', state)
 
     if bufnr != 0
