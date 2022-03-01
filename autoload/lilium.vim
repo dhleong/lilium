@@ -20,6 +20,7 @@ func! lilium#project() " {{{
     endif
 
     let inst = lilium#strategy#create()
+    let inst.cwd = getcwd()
     let b:_lilium_project = inst
     return inst
 endfunc " }}}

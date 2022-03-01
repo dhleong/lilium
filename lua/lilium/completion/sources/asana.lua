@@ -64,7 +64,7 @@ local M = {
 
 ---@param params Params
 function M.create(params)
-  local config = fs.find_json(params.bufnr, asana_config_filename)
+  local config = fs.find_json(params, asana_config_filename)
   if not config then
     return
   end

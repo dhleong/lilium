@@ -48,15 +48,14 @@ local M = {
 
 ---@param params Params
 function M.create(params)
-  local cwd = vim.fn.expand('#' .. params.bufnr .. ':p:h')
   local repo_url = command.exec {
     command = 'gh',
     args = { 'browse', '--no-browser' },
-    cwd = cwd,
+    cwd = params.cwd,
   }
 
   if repo_url then
-    return GithubSource:new { cwd = cwd }
+    return GithubSource:new { cwd = params.cwd }
   end
 end
 
