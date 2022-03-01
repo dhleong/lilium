@@ -15,15 +15,15 @@ M.read_path = a.wrap(function(path, callback)
   path:read(callback)
 end, 2)
 
----@param bufnr number
+---@param params { cwd: string }
 ---@param filename string
-function M.find_config(bufnr, filename)
-  if not bufnr then
-    print('[error] missing bufnr; filename=', filename)
+function M.find_config(params, filename)
+  if not params.cwd then
+    print('[error] missing cwd; filename=', filename)
     return
   end
 
-  local path = Path:new(vim.fn.fnamemodify('#' .. bufnr, ':p:h'))
+  local path = Path:new(params.cwd)
   for _, parent in ipairs(path:parents()) do
     local read = M.read_path(Path:new(parent) / filename)
     if read then
@@ -32,10 +32,10 @@ function M.find_config(bufnr, filename)
   end
 end
 
----@param bufnr number
+---@param params { cwd: string }
 ---@param filename string
-function M.find_json(bufnr, filename)
-  local text = M.find_config(bufnr, filename)
+function M.find_json(params, filename)
+  local text = M.find_config(params, filename)
   if text then
     a.util.scheduler()
     return vim.fn.json_decode(text)
