@@ -123,6 +123,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
 
     let env = {
         \ 'EDITOR': editor,
+        \ 'NVIM_LISTEN_ADDRESS': v:servername,
         \ 'LILIUM_TEMP': state.temp,
         \ }
 
