@@ -26,6 +26,7 @@ func! s:TempScript(...)
     let temp = s:temp_scripts[body]
     if !filereadable(temp)
         call writefile(['#!/bin/sh'] + lines, temp)
+        call setfperm(temp, 'rwxrwxrwx')
     endif
     return s:temp_scripts[body]
 endfunc " }}}
@@ -108,7 +109,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
         let onEditScript = s:CreateOnEditScriptVim(sid)
     endif
 
-    let editor = 'sh ' . s:TempScript(
+    let editor = s:TempScript(
           \ '[ -f "$LILIUM_TEMP.exit" ] && exit 1',
           \ 'editing="$1"',
           \ 'while [ ! -f "$editing" -a ! -f "$LILIUM_TEMP.exit" ]; do sleep 0.05 2>/dev/null || sleep 1; done',
