@@ -1,4 +1,4 @@
----@alias Params {bufnr:number, bufname:string}
+---@alias Params {bufnr:number, bufname:string, cwd:string}
 ---@alias Ticket {title:string, ref:string}
 
 ---@class CompletionSource

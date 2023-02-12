@@ -1,5 +1,5 @@
-local async = require'lilium.async'
-local command = require'lilium.command'
+local async = require 'lilium.async'
+local command = require 'lilium.command'
 
 local function format_issue(issue)
   return {
@@ -8,12 +8,13 @@ local function format_issue(issue)
   }
 end
 
----@alias GithubConfig {token:string, workspace:string}
+---@alias GithubConfig {cwd:string}
 
 ---@class GithubSource : CompletionSource
 ---@field config GithubConfig
 local GithubSource = {}
 
+---@param config GithubConfig
 function GithubSource:new(config)
   local obj = { config = config }
   setmetatable(obj, self)

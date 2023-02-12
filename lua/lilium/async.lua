@@ -1,9 +1,20 @@
-local a = require'plenary.async'
+local a = require 'plenary.async'
 
 local M = {}
 
 function M.main_thread()
   a.util.scheduler()
+end
+
+-- Given a coroutine function `f` and list of `items`, - return a list of
+-- "futures", created by calling `f` with - each item in `items`. This is
+-- basically just a convenience around vim.tbl_map
+function M.futures_map(f, items)
+  return vim.tbl_map(function(item)
+    return function()
+      return f(item)
+    end
+  end, items)
 end
 
 -- Given a list of "futures" (a function that might be a coroutine), asynchronously
@@ -18,8 +29,8 @@ function M.await_all(futures)
 
   -- It's unclear why, but each `result` is wrapped in a list...
   local output = {}
-  for i, result in ipairs(results) do
-    output[i] = result[1]
+  for _, result in ipairs(results) do
+    table.insert(output, result[1])
   end
 
   return output
