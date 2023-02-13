@@ -8,7 +8,7 @@ local COMPLETION = methods.internal.COMPLETION
 local function create_item(ticket)
   return {
     insertText = ticket.ref,
-    kind = vim.lsp.protocol.CompletionItemKind.Text,
+    kind = vim.lsp.protocol.CompletionItemKind.Reference,
     label = ticket.title,
 
     textEdit = ticket.textEdit,

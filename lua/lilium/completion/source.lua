@@ -1,5 +1,5 @@
 ---@alias Params {bufnr:number, bufname:string, cwd:string}
----@alias Ticket {title:string, ref:string}
+---@alias Ticket {title:string, ref:string, textEdit:string|nil}
 
 ---@class CompletionSource
 local CompletionSource = {}
