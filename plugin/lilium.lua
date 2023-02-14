@@ -3,4 +3,6 @@ if vim.fn.has('nvim') then
   if ok and vim.g.lilium_enable_source ~= 0 then
     null_ls.enable(require 'lilium.source')
   end
+
+  require 'lilium'.setup_common()
 end

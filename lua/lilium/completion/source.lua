@@ -2,7 +2,13 @@
 ---@alias Ticket {title:string, ref:string, textEdit:string|nil}
 
 ---@class CompletionSource
+---@field name string
 local CompletionSource = {}
+
+---@return string[]|nil
+function CompletionSource:describe_state()
+  return {}
+end
 
 ---@return Ticket[]
 function CompletionSource:gather_completions(_)

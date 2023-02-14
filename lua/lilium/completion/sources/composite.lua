@@ -35,7 +35,11 @@ end
 function M:create(params)
   local source_promises = async.futures_map(function(module)
     local factory = require(module)
-    return factory.create(params)
+    local instance = factory.create(params)
+    if instance then
+      instance.module = module
+    end
+    return instance
   end, self.modules)
   local sources = async.await_all(source_promises)
   return CompositeSource:new(sources)

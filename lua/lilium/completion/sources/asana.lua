@@ -1,5 +1,5 @@
-local fs = require'lilium.fs'
-local http = require'lilium.http'
+local fs = require 'lilium.fs'
+local http = require 'lilium.http'
 
 local asana_config_filename = '.lilium.asana.json'
 local api_base = 'https://app.asana.com/api/1.0'
@@ -8,7 +8,7 @@ local issue_url_base = 'https://app.asana.com/0/0/'
 local typeahead_by_prefix = {
   ['#'] = {
     type = 'task',
-    format = function (task)
+    format = function(task)
       return {
         title = task.name,
         ref = issue_url_base .. task.gid,
@@ -24,19 +24,16 @@ local typeahead_by_prefix = {
 local AsanaSource = {}
 
 function AsanaSource:new(config)
-  local obj = { config = config }
+  local obj = { name = 'Asana', config = config }
   setmetatable(obj, self)
   self.__index = self
   return obj
 end
 
----@param type 'user'|'task'
-function AsanaSource:_typeahead(type)
+function AsanaSource:_get_json(opts)
   local response = http.get_json {
-    url = api_base .. '/workspaces/' .. self.config.workspace .. '/typeahead',
-    params = {
-      resource_type = type,
-    },
+    url = api_base .. opts.path,
+    params = opts.params,
     headers = {
       authorization = 'Bearer ' .. self.config.token,
     },
@@ -44,6 +41,28 @@ function AsanaSource:_typeahead(type)
 
   if response then
     return response.data
+  end
+end
+
+---@param type 'user'|'task'
+function AsanaSource:_typeahead(type)
+  return self:_get_json {
+    path = '/workspaces/' .. self.config.workspace .. '/typeahead',
+    params = {
+      resource_type = type,
+    }
+  }
+end
+
+function AsanaSource:describe_state()
+  local user = self:_get_json {
+    path = '/users/me',
+  }
+
+  if user then
+    return { 'Signed in as: *' .. user.email .. '*.' }
+  else
+    return { 'Signed out; update credentials in ' .. asana_config_filename }
   end
 end
 

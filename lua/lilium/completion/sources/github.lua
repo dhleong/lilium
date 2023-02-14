@@ -16,7 +16,7 @@ local GithubSource = {}
 
 ---@param config GithubConfig
 function GithubSource:new(config)
-  local obj = { config = config }
+  local obj = { name = 'Github', config = config }
   setmetatable(obj, self)
   self.__index = self
   return obj
@@ -29,6 +29,19 @@ function GithubSource:_list(type)
     cwd = self.config.cwd,
   }
   return output or {}
+end
+
+function GithubSource:describe_state()
+  local output = command.exec_json {
+    command = 'gh',
+    args = { 'api', 'user' },
+    cwd = self.config.cwd,
+  }
+  if output then
+    return { 'Signed in as: *' .. output.login .. '*.' }
+  else
+    return { 'Signed out; use `gh auth` to sign in.' }
+  end
 end
 
 function GithubSource:gather_completions(params)
