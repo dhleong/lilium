@@ -2,15 +2,16 @@ use tower_lsp::{
     jsonrpc,
     lsp_types::{
         CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams,
-        CompletionResponse, InitializeParams, InitializeResult, InitializedParams,
-        InsertTextFormat, InsertTextMode, Range, ServerCapabilities, ServerInfo,
-        WorkDoneProgressOptions,
+        CompletionResponse, CompletionTextEdit, InitializeParams, InitializeResult,
+        InitializedParams, InsertTextFormat, InsertTextMode, ServerCapabilities, ServerInfo,
+        TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
     },
     Client, LanguageServer,
 };
 
 use crate::{
     adapters::{Adapter, InitializableAdapter},
+    documents::Documents,
     progress::ProgressReporter,
 };
 
@@ -18,6 +19,7 @@ use crate::{
 pub struct Backend {
     client: Client,
     adapter: InitializableAdapter,
+    documents: Documents,
 }
 
 impl Backend {
@@ -25,6 +27,7 @@ impl Backend {
         Self {
             client,
             adapter: InitializableAdapter::default(),
+            documents: Documents::default(),
         }
     }
 }
@@ -38,6 +41,9 @@ impl LanguageServer for Backend {
                 version: Some(env!("CARGO_PKG_VERSION").to_string()),
             }),
             capabilities: ServerCapabilities {
+                text_document_sync: Some(tower_lsp::lsp_types::TextDocumentSyncCapability::Kind(
+                    TextDocumentSyncKind::FULL,
+                )),
                 completion_provider: Some(CompletionOptions {
                     resolve_provider: Some(false),
                     trigger_characters: Some(vec!["@".to_string(), "#".to_string()]),
@@ -65,18 +71,38 @@ impl LanguageServer for Backend {
         Ok(())
     }
 
+    async fn did_open(&self, params: tower_lsp::lsp_types::DidOpenTextDocumentParams) {
+        self.documents.did_open(&params)
+    }
+
+    async fn did_change(&self, params: tower_lsp::lsp_types::DidChangeTextDocumentParams) {
+        self.documents.did_change(&params)
+    }
+
     async fn completion(
         &self,
         params: CompletionParams,
     ) -> jsonrpc::Result<Option<CompletionResponse>> {
-        let tickets = self.adapter.tickets().await?;
+        let context = if let Some(context) = self.documents.build_completion_context(&params) {
+            context
+        } else {
+            return Ok(None);
+        };
+        let tickets = self.adapter.tickets(&context).await?;
 
         let items = tickets
             .into_iter()
             .map(|mut ticket| {
+                let is_simple_ticket_ref = ticket.reference.starts_with('#');
+
+                // NOTE: Including the prefix in the filter_text like this
+                // is important so clients can continue to match even if
+                // the prefix isn't included in the final output
+                // (IE: !is_simple_ticket_ref)
                 CompletionItem {
                     filter_text: Some(format!(
-                        "{title} #{id}",
+                        "{prefix}{title} {id}",
+                        prefix = '#', // TODO
                         title = ticket.title,
                         id = ticket.id
                     )),
@@ -85,31 +111,18 @@ impl LanguageServer for Backend {
                     kind: Some(CompletionItemKind::TEXT),
                     detail: ticket.description,
                     sort_text: None, // TODO ?
-                    insert_text: if ticket.reference.starts_with('#') {
+                    insert_text: if is_simple_ticket_ref {
                         Some(ticket.reference.split_off(1))
                     } else {
                         None
                     },
-                    text_edit: if ticket.reference.starts_with('#') {
+                    text_edit: if is_simple_ticket_ref {
                         None
                     } else {
-                        Some(tower_lsp::lsp_types::CompletionTextEdit::Edit(
-                            tower_lsp::lsp_types::TextEdit {
-                                range: Range {
-                                    // TODO: Compute position of #
-                                    start: tower_lsp::lsp_types::Position {
-                                        line: params.text_document_position.position.line,
-                                        character: params
-                                            .text_document_position
-                                            .position
-                                            .character
-                                            .saturating_sub(1),
-                                    },
-                                    end: params.text_document_position.position,
-                                },
-                                new_text: ticket.reference,
-                            },
-                        ))
+                        Some(CompletionTextEdit::Edit(TextEdit {
+                            range: context.completion_range(),
+                            new_text: ticket.reference,
+                        }))
                     },
                     insert_text_format: Some(InsertTextFormat::PLAIN_TEXT),
                     insert_text_mode: Some(InsertTextMode::AS_IS),

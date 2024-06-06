@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use tokio::sync::Mutex;
 use tower_lsp::jsonrpc::{self, ErrorCode};
 
-use crate::progress::ProgressReporter;
+use crate::{completion::CompletionContext, progress::ProgressReporter};
 
 use self::github::GithubAdapter;
 
@@ -37,7 +37,7 @@ impl From<AdapterError> for jsonrpc::Error {
 
 #[async_trait]
 pub trait Adapter {
-    async fn tickets(&self) -> Result<Vec<Ticket>, AdapterError> {
+    async fn tickets(&self, _context: &CompletionContext) -> Result<Vec<Ticket>, AdapterError> {
         Ok(vec![])
     }
 }
@@ -47,8 +47,8 @@ struct CompositeAdapter;
 
 #[async_trait]
 impl Adapter for CompositeAdapter {
-    async fn tickets(&self) -> Result<Vec<Ticket>, AdapterError> {
-        GithubAdapter.tickets().await
+    async fn tickets(&self, context: &CompletionContext) -> Result<Vec<Ticket>, AdapterError> {
+        GithubAdapter.tickets(context).await
     }
 }
 
@@ -72,10 +72,10 @@ impl InitializableAdapter {
 
 #[async_trait]
 impl Adapter for InitializableAdapter {
-    async fn tickets(&self) -> Result<Vec<Ticket>, AdapterError> {
+    async fn tickets(&self, context: &CompletionContext) -> Result<Vec<Ticket>, AdapterError> {
         let mutex = self.adapter.lock().await;
         let adapter = mutex.as_ref().ok_or(AdapterError::NotInitialized)?;
 
-        adapter.tickets().await
+        adapter.tickets(context).await
     }
 }

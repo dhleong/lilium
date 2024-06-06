@@ -1,12 +1,17 @@
 use async_trait::async_trait;
 
+use crate::completion::CompletionContext;
+
 use super::{Adapter, Ticket};
 
 pub struct GithubAdapter;
 
 #[async_trait]
 impl Adapter for GithubAdapter {
-    async fn tickets(&self) -> Result<Vec<Ticket>, super::AdapterError> {
+    async fn tickets(
+        &self,
+        context: &CompletionContext,
+    ) -> Result<Vec<Ticket>, super::AdapterError> {
         Ok(vec![
             Ticket {
                 id: "9001".to_string(),

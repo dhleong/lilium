@@ -3,6 +3,8 @@ use tower_lsp::{LspService, Server};
 
 pub mod adapters;
 mod backend;
+mod completion;
+pub mod documents;
 mod progress;
 
 #[tokio::main]

@@ -7,6 +7,8 @@ edition = "2021"
 
 [dependencies]
 async-trait = "0.1.80"
+dashmap = "5.5.3"
+ropey = "1.6.1"
 serde_json = "1.0.117"
 tokio = { version = "1.38.0", features = ["full"] }
 tower-lsp = "0.20.0"
