@@ -1,10 +1,28 @@
+mod cli;
+
 use async_trait::async_trait;
 
 use crate::completion::CompletionContext;
 
-use super::{Adapter, Ticket};
+use self::cli::GhCli;
 
-pub struct GithubAdapter;
+use super::{Adapter, AdapterError, AdapterParams, Ticket};
+
+#[derive(Debug)]
+pub struct GithubAdapter {
+    cli: GhCli,
+}
+
+impl GithubAdapter {
+    pub async fn create(params: AdapterParams) -> Result<GithubAdapter, AdapterError> {
+        let cli = GhCli { root: params.root };
+        if !cli.is_authenticated().await? {
+            Err(AdapterError::LoggedOut)
+        } else {
+            Ok(GithubAdapter { cli })
+        }
+    }
+}
 
 #[async_trait]
 impl Adapter for GithubAdapter {
@@ -12,6 +30,7 @@ impl Adapter for GithubAdapter {
         &self,
         context: &CompletionContext,
     ) -> Result<Vec<Ticket>, super::AdapterError> {
+        self.cli.tickets(&context.text).await?;
         Ok(vec![
             Ticket {
                 id: "9001".to_string(),

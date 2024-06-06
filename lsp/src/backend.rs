@@ -34,7 +34,11 @@ impl Backend {
 
 #[tower_lsp::async_trait]
 impl LanguageServer for Backend {
-    async fn initialize(&self, _: InitializeParams) -> jsonrpc::Result<InitializeResult> {
+    async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
+        if let Some(root) = params.root_uri {
+            self.adapter.set_root(root.to_string()).await;
+        }
+
         Ok(InitializeResult {
             server_info: Some(ServerInfo {
                 name: env!("CARGO_PKG_NAME").to_string(),
