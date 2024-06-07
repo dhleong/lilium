@@ -3,8 +3,8 @@ use tower_lsp::{
     lsp_types::{
         CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams,
         CompletionResponse, CompletionTextEdit, InitializeParams, InitializeResult,
-        InitializedParams, InsertTextFormat, InsertTextMode, MessageType, ServerCapabilities,
-        ServerInfo, TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
+        InitializedParams, InsertTextFormat, InsertTextMode, ServerCapabilities, ServerInfo,
+        TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
     },
     Client, LanguageServer,
 };
@@ -97,16 +97,6 @@ impl LanguageServer for Backend {
         };
 
         let tickets = self.adapter.tickets(&context).await?;
-
-        self.client
-            .show_message(
-                MessageType::ERROR,
-                format!(
-                    "have tickets... {adapter:#?} {tickets:#?}",
-                    adapter = self.adapter
-                ),
-            )
-            .await;
 
         let items = tickets
             .into_iter()

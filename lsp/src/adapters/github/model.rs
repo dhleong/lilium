@@ -9,3 +9,9 @@ pub struct GithubIssuesSearchResult {
     pub title: String,
     pub body: String,
 }
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct GithubNameWithOwner {
+    pub name_with_owner: String,
+}

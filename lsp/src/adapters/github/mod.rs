@@ -12,16 +12,18 @@ use super::{Adapter, AdapterError, AdapterParams, Ticket};
 #[derive(Debug)]
 pub struct GithubAdapter {
     cli: GhCli,
+    repo_name: Option<String>,
 }
 
 impl GithubAdapter {
     pub async fn create(params: AdapterParams) -> Result<GithubAdapter, AdapterError> {
         let cli = GhCli { root: params.root };
         if !cli.is_authenticated().await? {
-            Err(AdapterError::LoggedOut)
-        } else {
-            Ok(GithubAdapter { cli })
+            return Err(AdapterError::LoggedOut);
         }
+
+        let repo_name = cli.repo_name().await.ok();
+        Ok(GithubAdapter { cli, repo_name })
     }
 }
 
@@ -31,7 +33,10 @@ impl Adapter for GithubAdapter {
         &self,
         context: &CompletionContext,
     ) -> Result<Vec<Ticket>, super::AdapterError> {
-        let results = self.cli.tickets(&context.text).await?;
+        let results = self
+            .cli
+            .tickets(self.repo_name.as_deref(), &context.text)
+            .await?;
         let tickets = results
             .0
             .into_iter()

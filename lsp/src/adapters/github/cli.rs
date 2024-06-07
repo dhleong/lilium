@@ -4,7 +4,7 @@ use tokio::process::Command;
 
 use crate::adapters::AdapterError;
 
-use super::model::GithubIssuesSearchResults;
+use super::model::{GithubIssuesSearchResults, GithubNameWithOwner};
 
 #[derive(Debug)]
 pub struct GhCli {
@@ -20,14 +20,21 @@ impl GhCli {
         Ok(auth_result.status.success())
     }
 
-    pub async fn tickets(&self, query: &str) -> Result<GithubIssuesSearchResults, AdapterError> {
-        let repo = if let Some(_) = &self.root {
-            // TODO:
-            Some("dhleong/wish")
-        } else {
-            None
-        };
+    pub async fn repo_name(&self) -> Result<String, AdapterError> {
+        // NOTE: This seems to do an API request, which is... lame, at best
+        let output = self
+            .execute(&["repo", "view", "--json", "nameWithOwner"])
+            .await?;
 
+        let result: GithubNameWithOwner = serde_json::from_slice(&output.stdout)?;
+        Ok(result.name_with_owner)
+    }
+
+    pub async fn tickets(
+        &self,
+        repo: Option<&str>,
+        query: &str,
+    ) -> Result<GithubIssuesSearchResults, AdapterError> {
         let mut args = vec![
             "search",
             "issues",
