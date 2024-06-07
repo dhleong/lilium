@@ -34,7 +34,7 @@ pub enum AdapterError {
 impl From<AdapterError> for jsonrpc::Error {
     fn from(value: AdapterError) -> Self {
         Self {
-            code: ErrorCode::InternalError,
+            code: ErrorCode::ServerError(500),
             message: format!("{value:?}").into(),
             data: None,
         }
@@ -73,15 +73,16 @@ impl InitializableAdapter {
     }
 
     pub async fn initialize<'r>(&self, progress: &ProgressReporter<'r>) {
-        progress.report(Some("Working..."), Some(25)).await;
-
         let mut mutex = self.adapter.write().await;
-        let root = self.root.read().await;
         if mutex.is_none() {
-            *mutex = Some(CompositeAdapter::create(AdapterParams { root: root.clone() }).await);
-        }
+            progress.report(Some("Working..."), Some(0)).await;
 
-        progress.report(Some("Ready!"), Some(100)).await;
+            let root = self.root.read().await;
+
+            *mutex = Some(CompositeAdapter::create(AdapterParams { root: root.clone() }).await);
+
+            progress.report(Some("Ready!"), Some(100)).await;
+        }
     }
 }
 

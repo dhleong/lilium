@@ -39,24 +39,13 @@ impl Adapter for GithubAdapter {
                 id: result.number.to_string(),
                 reference: format!("#{id}", id = result.number),
                 title: result.title,
-                description: Some(result.body),
+                description: if result.body.is_empty() {
+                    None
+                } else {
+                    Some(result.body)
+                },
             })
             .collect();
         Ok(tickets)
-
-        //     Ok(vec![
-        //         Ticket {
-        //             id: "9001".to_string(),
-        //             reference: "#9001".to_string(),
-        //             title: "Adjust emotional weights".to_string(),
-        //             description: Some("Test github-like ticket".to_string()),
-        //         },
-        //         Ticket {
-        //             id: "42".to_string(),
-        //             reference: "https://asana.com/tickets/42".to_string(),
-        //             title: "Reticulate Splines".to_string(),
-        //             description: Some("Test asana-like ticket".to_string()),
-        //         },
-        //     ])
     }
 }

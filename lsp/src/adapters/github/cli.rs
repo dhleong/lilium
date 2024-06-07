@@ -23,7 +23,7 @@ impl GhCli {
     pub async fn tickets(&self, query: &str) -> Result<GithubIssuesSearchResults, AdapterError> {
         let repo = if let Some(_) = &self.root {
             // TODO:
-            Some("dhleong/playactor")
+            Some("dhleong/wish")
         } else {
             None
         };

@@ -22,6 +22,7 @@ async fn run_lsp() {
 }
 
 async fn print_tickets(root: Option<String>) {
+    println!("root={root:#?}");
     let adapter = CompositeAdapter::create(AdapterParams { root }).await;
     let tickets = adapter
         .tickets(&CompletionContext {
@@ -44,6 +45,6 @@ async fn main() {
     let cli = Cli::parse();
     match cli.command {
         Commands::Lsp => run_lsp().await,
-        Commands::Tickets => print_tickets(None).await,
+        Commands::Tickets { root } => print_tickets(root).await,
     }
 }

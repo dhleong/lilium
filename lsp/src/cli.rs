@@ -3,7 +3,11 @@ use clap::{Parser, Subcommand};
 #[derive(Debug, Subcommand)]
 pub enum Commands {
     Lsp,
-    Tickets,
+
+    Tickets {
+        #[arg(short, long)]
+        root: Option<String>,
+    },
 }
 
 #[derive(Parser, Debug)]

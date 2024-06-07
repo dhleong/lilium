@@ -3,8 +3,8 @@ use tower_lsp::{
     lsp_types::{
         CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams,
         CompletionResponse, CompletionTextEdit, InitializeParams, InitializeResult,
-        InitializedParams, InsertTextFormat, InsertTextMode, ServerCapabilities, ServerInfo,
-        TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
+        InitializedParams, InsertTextFormat, InsertTextMode, MessageType, ServerCapabilities,
+        ServerInfo, TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
     },
     Client, LanguageServer,
 };
@@ -36,7 +36,10 @@ impl Backend {
 impl LanguageServer for Backend {
     async fn initialize(&self, params: InitializeParams) -> jsonrpc::Result<InitializeResult> {
         if let Some(root) = params.root_uri {
-            self.adapter.set_root(root.to_string()).await;
+            let path = root.to_file_path().unwrap();
+            self.adapter
+                .set_root(path.to_string_lossy().to_string())
+                .await;
         }
 
         Ok(InitializeResult {
@@ -92,7 +95,18 @@ impl LanguageServer for Backend {
         } else {
             return Ok(None);
         };
+
         let tickets = self.adapter.tickets(&context).await?;
+
+        self.client
+            .show_message(
+                MessageType::ERROR,
+                format!(
+                    "have tickets... {adapter:#?} {tickets:#?}",
+                    adapter = self.adapter
+                ),
+            )
+            .await;
 
         let items = tickets
             .into_iter()
