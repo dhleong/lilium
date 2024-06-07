@@ -8,6 +8,7 @@ use crate::{completion::CompletionContext, progress::ProgressReporter};
 
 use self::composite::CompositeAdapter;
 
+mod asana;
 pub(crate) mod composite;
 mod github;
 
@@ -19,6 +20,7 @@ pub struct Ticket {
     pub description: Option<String>,
 }
 
+#[derive(Clone)]
 pub struct AdapterParams {
     pub root: Option<String>,
 }

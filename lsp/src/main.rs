@@ -11,6 +11,7 @@ mod backend;
 mod cli;
 mod completion;
 pub mod documents;
+pub mod fs;
 mod progress;
 
 async fn run_lsp() {
@@ -24,6 +25,7 @@ async fn run_lsp() {
 async fn print_tickets(root: Option<String>) {
     println!("root={root:#?}");
     let adapter = CompositeAdapter::create(AdapterParams { root }).await;
+    println!("adapter={adapter:#?}");
     let tickets = adapter
         .tickets(&CompletionContext {
             kind: completion::CompletionKind::Tickets,
@@ -34,6 +36,11 @@ async fn print_tickets(root: Option<String>) {
             },
         })
         .await;
+
+    if let Err(err) = tickets {
+        println!("{:?}", err);
+        return;
+    }
 
     for ticket in &tickets {
         println!("{ticket:#?}");

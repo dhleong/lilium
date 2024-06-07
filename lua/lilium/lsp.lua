@@ -10,7 +10,7 @@ function M.install()
     configs.lilium = {
       default_config = {
         cmd = {
-          plugin_root .. "/target/debug/lilium-lsp",
+          plugin_root .. "/target/debug/lilium",
           "lsp",
         },
         filetypes = { "gitcommit", "markdown" },
