@@ -11,6 +11,7 @@ function M.install()
       default_config = {
         cmd = {
           plugin_root .. "/target/debug/lilium-lsp",
+          "lsp",
         },
         filetypes = { "gitcommit", "markdown" },
         root_dir = lspconfig.util.find_git_ancestor,

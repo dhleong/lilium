@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{io, sync::Arc};
 
 use async_trait::async_trait;
 use tokio::sync::RwLock;
@@ -8,7 +8,7 @@ use crate::{completion::CompletionContext, progress::ProgressReporter};
 
 use self::composite::CompositeAdapter;
 
-mod composite;
+pub(crate) mod composite;
 mod github;
 
 #[derive(Debug)]
@@ -38,6 +38,18 @@ impl From<AdapterError> for jsonrpc::Error {
             message: format!("{value:?}").into(),
             data: None,
         }
+    }
+}
+
+impl From<io::Error> for AdapterError {
+    fn from(value: io::Error) -> Self {
+        AdapterError::Other(value.to_string())
+    }
+}
+
+impl From<serde_json::Error> for AdapterError {
+    fn from(value: serde_json::Error) -> Self {
+        AdapterError::Other(value.to_string())
     }
 }
 

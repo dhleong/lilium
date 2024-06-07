@@ -4,6 +4,8 @@ use tokio::process::Command;
 
 use crate::adapters::AdapterError;
 
+use super::model::GithubIssuesSearchResults;
+
 #[derive(Debug)]
 pub struct GhCli {
     pub root: Option<String>,
@@ -18,7 +20,7 @@ impl GhCli {
         Ok(auth_result.status.success())
     }
 
-    pub async fn tickets(&self, query: &str) -> Result<(), AdapterError> {
+    pub async fn tickets(&self, query: &str) -> Result<GithubIssuesSearchResults, AdapterError> {
         let repo = if let Some(_) = &self.root {
             // TODO:
             Some("dhleong/playactor")
@@ -43,10 +45,16 @@ impl GhCli {
             args.push(query);
         }
 
-        // TODO: parse result
-        self.execute(args).await;
+        let output = self.execute(args).await?;
+        if !output.status.success() {
+            return if let Ok(error) = String::from_utf8(output.stderr) {
+                Err(AdapterError::Other(error))
+            } else {
+                Err(AdapterError::Other("Unexpected error".to_string()))
+            };
+        }
 
-        Ok(())
+        Ok(serde_json::from_slice(&output.stdout)?)
     }
 
     pub async fn execute<I, S>(&self, args: I) -> io::Result<Output>
