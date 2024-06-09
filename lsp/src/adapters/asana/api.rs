@@ -22,13 +22,20 @@ impl AsanaClient {
         &self,
         token: &str,
         workspace: Option<&String>,
+        text: &str,
     ) -> Result<AsanaTasksResult, AdapterError> {
         if let Some(workspace) = workspace {
+            let mut query_params = vec![("resource_type", "task"), ("opt_fields", "name,notes")];
+
+            if !text.is_empty() {
+                query_params.push(("query", text));
+            }
+
             let response = self
                 .client
                 .get(format!("{API_BASE}/workspaces/{workspace}/typeahead"))
                 .header("Authorization", format!("Bearer {token}"))
-                .query(&[("resource_type", "task")])
+                .query(&query_params)
                 .send()
                 .await?;
 

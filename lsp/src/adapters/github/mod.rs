@@ -42,6 +42,7 @@ impl Adapter for GithubAdapter {
             .into_iter()
             .map(|result| Ticket {
                 id: result.number.to_string(),
+                // TODO: If this ticket is not from repo_name, prefix it
                 reference: format!("#{id}", id = result.number),
                 title: result.title,
                 provider_prefix: format!("[GH#{id}]", id = result.number),

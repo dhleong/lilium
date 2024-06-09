@@ -42,11 +42,15 @@ impl AsanaAdapter {
 impl Adapter for AsanaAdapter {
     async fn tickets(
         &self,
-        _context: &crate::completion::CompletionContext,
+        context: &crate::completion::CompletionContext,
     ) -> Result<Vec<super::Ticket>, AdapterError> {
         let result = self
             .client
-            .get_tasks(&self.config.token, self.config.workspace.as_ref())
+            .get_tasks(
+                &self.config.token,
+                self.config.workspace.as_ref(),
+                &context.text,
+            )
             .await?;
         Ok(result
             .data
