@@ -114,7 +114,7 @@ impl LanguageServer for Backend {
                         title = ticket.title,
                         id = ticket.id
                     )),
-                    label: ticket.title,
+                    label: format!("{} {}", ticket.provider_prefix, ticket.title),
                     label_details: None,
                     kind: Some(CompletionItemKind::TEXT),
                     detail: ticket.description,

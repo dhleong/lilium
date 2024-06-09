@@ -44,6 +44,7 @@ impl Adapter for GithubAdapter {
                 id: result.number.to_string(),
                 reference: format!("#{id}", id = result.number),
                 title: result.title,
+                provider_prefix: format!("[GH#{id}]", id = result.number),
                 description: if result.body.is_empty() {
                     None
                 } else {

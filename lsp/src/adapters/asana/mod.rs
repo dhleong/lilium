@@ -51,11 +51,17 @@ impl Adapter for AsanaAdapter {
         Ok(result
             .data
             .into_iter()
-            .map(|task| Ticket {
-                reference: format!("{TASK_URL_BASE}/{gid}", gid = task.gid),
-                id: task.gid,
-                title: task.name,
-                description: None,
+            .map(|task| {
+                let gid = &task.gid;
+                let reference = format!("{TASK_URL_BASE}/{gid}");
+                Ticket {
+                    description: Some(reference.clone()),
+                    // NOTE: The ID isn't super useful...
+                    provider_prefix: "[ASANA]".to_string(),
+                    id: task.gid,
+                    title: task.name,
+                    reference,
+                }
             })
             .collect())
     }

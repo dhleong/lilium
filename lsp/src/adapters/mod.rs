@@ -17,6 +17,7 @@ pub struct Ticket {
     pub id: String,
     pub reference: String,
     pub title: String,
+    pub provider_prefix: String,
     pub description: Option<String>,
 }
 
