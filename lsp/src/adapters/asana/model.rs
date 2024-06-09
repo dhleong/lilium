@@ -14,6 +14,7 @@ pub struct AsanaTasksResult {
 
 #[derive(Debug, Deserialize)]
 pub struct AsanaTask {
-    pub name: String,
     pub gid: String,
+    pub name: String,
+    pub notes: String,
 }

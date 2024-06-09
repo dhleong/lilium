@@ -59,7 +59,7 @@ impl Adapter for AsanaAdapter {
                 let gid = &task.gid;
                 let reference = format!("{TASK_URL_BASE}/{gid}");
                 Ticket {
-                    description: Some(reference.clone()),
+                    description: Some(format!("{}\n\n{}", reference, task.notes)),
                     // NOTE: The ID isn't super useful...
                     provider_prefix: "[ASANA]".to_string(),
                     id: task.gid,
