@@ -29,16 +29,30 @@ function M.setup_common()
   end
 end
 
+-- NOTE: We don't have any options... yet
+---@alias LiliumLspConfig {}
+
 ---@class LiliumConfig
 local DEFAULT_CONFIG = {
+  ---@type LiliumLspConfig|nil
+  setup_lsp = nil,
   install_fugitive_browse = true,
 }
 
 ---@param config LiliumConfig
 function M.setup(config)
   config = vim.tbl_deep_extend("force", DEFAULT_CONFIG, config)
-  M.setup_common()
 
+  -- You're either lsp or common; not both
+  if config.setup_lsp then
+    require("lilium.lsp").setup(config.setup_lsp)
+  else
+    M.setup_common()
+  end
+
+  -- We can probably still provide this if requested in lsp mode
+  -- (although we can probably deprecate in favor of rhubarb since
+  -- actually rhubarb worked just fine)
   if config.install_fugitive_browse then
     local f = require("lilium.browse").handle_browse
     M._installed_browse_handler = f
