@@ -83,7 +83,7 @@ impl<T: Adapter + Sync> Adapter for CachedAdapter<T> {
         match (base, self.adapter.tickets(context).await) {
             (Some(base), Ok(results)) => {
                 let mut combined = [base, results].concat();
-                combined.dedup_by_key(|ticket| ticket.reference.clone());
+                combined.dedup_by(|a, b| a.reference == b.reference);
                 Ok(combined)
             }
             (Some(base), Err(_)) => Ok(base),
