@@ -14,7 +14,12 @@ function M.install()
           "lsp",
         },
         filetypes = { "gitcommit", "markdown" },
-        root_dir = lspconfig.util.find_git_ancestor,
+        root_dir = function(startpath)
+          -- Use the enhanced editor path, if set. This lets us provide LSP completion
+          -- to `gh pr` tmp files for the appropriate project!
+          local enhanced_editor_path = require("lilium.lsp.enhanced_editor").get_project_path_for_file(startpath)
+          return enhanced_editor_path or lspconfig.util.find_git_ancestor(startpath)
+        end,
       },
     }
   end

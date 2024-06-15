@@ -45,6 +45,7 @@ function M.setup(config)
 
   -- You're either lsp or common; not both
   if config.setup_lsp then
+    M._lsp_config = config.setup_lsp
     require("lilium.lsp").setup(config.setup_lsp)
   else
     M.setup_common()

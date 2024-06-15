@@ -61,11 +61,25 @@ func! s:OnEdit(bufnr, args) " {{{
 
     setlocal bufhidden=hide
 
+    if state.enhanced && has('nvim')
+        try
+            call luaeval("require('lilium.lsp.enhanced_editor').prepare(_A)", {
+                \ 'path': path,
+                \ 'project': { 'cwd': state.project.cwd }})
+        catch /.*/
+            echom 'Failed to prepare'
+            echom v:exception
+        endtry
+    endif
+
     exe 'edit ' . path
 
     if state.enhanced
+        " TODO: Support nvim lsp mode here
         let b:_lilium_project = state.project
-        call lilium#Enable()
+        if !has('nvim')
+            call lilium#Enable()
+        endif
     endif
 
     let editorBufnr = bufnr('%')
