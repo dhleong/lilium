@@ -14,7 +14,7 @@ const TASK_URL_BASE: &str = "https://app.asana.com/0/0";
 mod api;
 mod model;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AsanaAdapter {
     config: AsanaConfig,
     client: AsanaClient,
