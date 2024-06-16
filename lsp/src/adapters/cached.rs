@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
+use itertools::Itertools;
 use tokio::sync::RwLock;
 use tower_lsp::lsp_types::Position;
 
@@ -81,11 +82,11 @@ impl<T: Adapter + Sync> Adapter for CachedAdapter<T> {
         }
 
         match (base, self.adapter.tickets(context).await) {
-            (Some(base), Ok(results)) => {
-                let mut combined = [base, results].concat();
-                combined.dedup_by(|a, b| a.reference == b.reference);
-                Ok(combined)
-            }
+            (Some(base), Ok(results)) => Ok([base, results]
+                .concat()
+                .into_iter()
+                .unique_by(|ticket| ticket.reference.clone())
+                .collect_vec()),
             (Some(base), Err(_)) => Ok(base),
             (None, fresh_result) => fresh_result,
         }
