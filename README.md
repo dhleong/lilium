@@ -59,7 +59,7 @@ We may provide a util for selecting the correct workspace ID in the future.
 ## Status
 
 Mode| Status
-==|==
+--|--
 Vim/YCM | "Keep the lights on"
 none-ls | Deprecated; prefer LSP
 LSP | Actively supported!
