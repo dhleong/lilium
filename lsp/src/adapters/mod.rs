@@ -9,10 +9,11 @@ use crate::{completion::CompletionContext, progress::ProgressReporter};
 use self::composite::CompositeAdapter;
 
 mod asana;
+mod cached;
 pub(crate) mod composite;
 mod github;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Ticket {
     pub id: String,
     pub reference: String,

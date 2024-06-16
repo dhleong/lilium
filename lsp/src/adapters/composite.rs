@@ -4,13 +4,14 @@ use tokio::task::JoinHandle;
 use crate::completion::CompletionContext;
 
 use super::{
-    asana::AsanaAdapter, github::GithubAdapter, Adapter, AdapterError, AdapterParams, Ticket,
+    asana::AsanaAdapter, cached::CachedAdapter, github::GithubAdapter, Adapter, AdapterError,
+    AdapterParams, Ticket,
 };
 
 #[derive(Debug)]
 pub struct CompositeAdapter {
-    asana: Option<AsanaAdapter>,
-    github: Option<GithubAdapter>,
+    asana: Option<CachedAdapter<AsanaAdapter>>,
+    github: Option<CachedAdapter<GithubAdapter>>,
 }
 
 impl CompositeAdapter {
@@ -18,10 +19,10 @@ impl CompositeAdapter {
         let github_job = tokio::spawn(GithubAdapter::create(params.clone()));
         let asana_job = tokio::spawn(AsanaAdapter::create(params.clone()));
 
-        CompositeAdapter {
-            asana: unpack_job(asana_job).await,
-            github: unpack_job(github_job).await,
-        }
+        let asana = CachedAdapter::wrap_and_init(unpack_job(asana_job).await);
+        let github = CachedAdapter::wrap_and_init(unpack_job(github_job).await);
+
+        CompositeAdapter { asana, github }
     }
 }
 

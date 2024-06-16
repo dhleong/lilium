@@ -6,7 +6,7 @@ use super::model::AsanaTasksResult;
 
 const API_BASE: &str = "https://app.asana.com/api/1.0";
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AsanaClient {
     client: Client,
 }

@@ -6,7 +6,7 @@ use crate::adapters::AdapterError;
 
 use super::model::{GithubIssuesSearchResults, GithubNameWithOwner};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct GhCli {
     pub root: Option<String>,
 }

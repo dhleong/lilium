@@ -9,7 +9,7 @@ use self::cli::GhCli;
 
 use super::{Adapter, AdapterError, AdapterParams, Ticket};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct GithubAdapter {
     cli: GhCli,
     repo_name: Option<String>,
