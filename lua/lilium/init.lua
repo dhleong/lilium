@@ -36,7 +36,9 @@ end
 local DEFAULT_CONFIG = {
   ---@type LiliumLspConfig|nil
   setup_lsp = nil,
-  install_fugitive_browse = true,
+
+  ---@deprecated
+  install_fugitive_browse = false,
 }
 
 ---@param config LiliumConfig
@@ -55,25 +57,7 @@ function M.setup(config)
   -- (although we can probably deprecate in favor of rhubarb since
   -- actually rhubarb worked just fine)
   if config.install_fugitive_browse then
-    local f = require("lilium.browse").handle_browse
-    M._installed_browse_handler = f
-
-    local handlers = (vim.g.fugitive_browse_handlers or {})
-    handlers[#handlers + 1] = f
-    vim.g.fugitive_browse_handlers = handlers
-  end
-end
-
-function M.deactivate()
-  if M._installed_browse_handler then
-    local handlers = (vim.g.fugitive_browse_handlers or {})
-    for i, f in ipairs(handlers) do
-      if f == M._installed_browse_handler then
-        table.remove(handlers, i)
-        vim.g.fugitive_browse_handlers = handlers
-        break
-      end
-    end
+    print("[lilium] install_fugitive_browse has been removed in favor of rhubarb")
   end
 end
 
