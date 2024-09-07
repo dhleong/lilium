@@ -56,6 +56,7 @@ function M.setup(config)
   -- We can probably still provide this if requested in lsp mode
   -- (although we can probably deprecate in favor of rhubarb since
   -- actually rhubarb worked just fine)
+  ---@diagnostic disable-next-line: deprecated
   if config.install_fugitive_browse then
     print("[lilium] install_fugitive_browse has been removed in favor of rhubarb")
   end
