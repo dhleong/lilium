@@ -63,3 +63,32 @@ impl Adapter for CompositeAdapter {
         }
     }
 }
+
+impl CompositeAdapter {
+    pub async fn describe(&self) -> String {
+        let mut output = String::default();
+
+        output.push_str("## Github\n");
+        if let Some(github) = &self.github {
+            let cached_count = github.cached_count().await;
+            let github = github.inner();
+            output.push_str(&format!("Repo name: {:?}", github.repo_name));
+
+            output.push_str(&format!("\nCached Tickets: {:?}", cached_count));
+        } else {
+            output.push_str("Not available.");
+        }
+
+        output.push_str("\n\n## Asana\n");
+        if let Some(asana) = &self.asana {
+            let cached_count = asana.cached_count().await;
+            // TODO: auth?
+            output.push_str("Configured!");
+            output.push_str(&format!("\nCached Tickets: {:?}", cached_count));
+        } else {
+            output.push_str("Not available.");
+        }
+
+        return output;
+    }
+}

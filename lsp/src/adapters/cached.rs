@@ -9,19 +9,10 @@ use crate::completion::{CompletionContext, CompletionKind};
 
 use super::{Adapter, Ticket};
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct CachedAdapter<T: Adapter + Sync> {
     adapter: T,
     cached_tickets: Arc<RwLock<Option<Vec<Ticket>>>>,
-}
-
-impl<T: Adapter + Sync + Clone> Clone for CachedAdapter<T> {
-    fn clone(&self) -> Self {
-        CachedAdapter {
-            adapter: self.adapter.clone(),
-            cached_tickets: self.cached_tickets.clone(),
-        }
-    }
 }
 
 impl<T: Adapter + Sync + Send + Clone + 'static> CachedAdapter<T> {
@@ -63,6 +54,15 @@ impl<T: Adapter + Sync> CachedAdapter<T> {
             let mut mutex = self.cached_tickets.write().await;
             *mutex = Some(tickets);
         }
+    }
+
+    pub async fn cached_count(&self) -> Option<usize> {
+        let mutex = self.cached_tickets.read().await;
+        mutex.as_ref().map(|v| v.len())
+    }
+
+    pub fn inner(&self) -> &T {
+        &self.adapter
     }
 }
 

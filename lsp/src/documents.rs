@@ -66,8 +66,6 @@ fn completion_context_from_line(
             }
         })?;
 
-    println!("len={len} start={prefix_start}");
-
     Some(CompletionContext {
         kind: CompletionKind::Tickets,
         text: before_cursor.slice((prefix_start + 1)..len).to_string(),

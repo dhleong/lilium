@@ -1,10 +1,10 @@
 use tower_lsp::{
-    jsonrpc,
+    jsonrpc::{self, Error},
     lsp_types::{
         CompletionItem, CompletionItemKind, CompletionOptions, CompletionParams,
-        CompletionResponse, CompletionTextEdit, InitializeParams, InitializeResult,
-        InitializedParams, InsertTextFormat, InsertTextMode, ServerCapabilities, ServerInfo,
-        TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
+        CompletionResponse, CompletionTextEdit, ExecuteCommandOptions, ExecuteCommandParams,
+        InitializeParams, InitializeResult, InitializedParams, InsertTextFormat, InsertTextMode,
+        ServerCapabilities, ServerInfo, TextDocumentSyncKind, TextEdit, WorkDoneProgressOptions,
     },
     Client, LanguageServer,
 };
@@ -51,6 +51,7 @@ impl LanguageServer for Backend {
                 text_document_sync: Some(tower_lsp::lsp_types::TextDocumentSyncCapability::Kind(
                     TextDocumentSyncKind::FULL,
                 )),
+
                 completion_provider: Some(CompletionOptions {
                     resolve_provider: Some(false),
                     trigger_characters: Some(vec!["@".to_string(), "#".to_string()]),
@@ -60,6 +61,14 @@ impl LanguageServer for Backend {
                     all_commit_characters: None,
                     completion_item: None,
                 }),
+
+                execute_command_provider: Some(ExecuteCommandOptions {
+                    commands: vec!["lilium.info".to_string()],
+                    work_done_progress_options: WorkDoneProgressOptions {
+                        work_done_progress: Some(true),
+                    },
+                }),
+
                 ..ServerCapabilities::default()
             },
         })
@@ -144,5 +153,35 @@ impl LanguageServer for Backend {
             items,
         });
         Ok(Some(response))
+    }
+
+    async fn execute_command(
+        &self,
+        params: ExecuteCommandParams,
+    ) -> jsonrpc::Result<Option<serde_json::Value>> {
+        let cmd: &str = &params.command;
+        match cmd {
+            "lilium.info" => {
+                let uri = params
+                    .arguments
+                    .into_iter()
+                    .next()
+                    .ok_or_else(|| Error::invalid_params("Missing uri"))?;
+
+                let serde_json::Value::String(uri) = uri else {
+                    return Err(Error::invalid_params("uri must be a string"));
+                };
+
+                let info = self.info(uri).await;
+                Ok(Some(info.into()))
+            }
+            _ => Err(Error::invalid_request()),
+        }
+    }
+}
+
+impl Backend {
+    async fn info(&self, _uri: String) -> String {
+        self.adapter.describe().await
     }
 }

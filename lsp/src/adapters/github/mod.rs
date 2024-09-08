@@ -11,8 +11,8 @@ use super::{Adapter, AdapterError, AdapterParams, Ticket};
 
 #[derive(Clone, Debug)]
 pub struct GithubAdapter {
-    cli: GhCli,
-    repo_name: Option<String>,
+    pub cli: GhCli,
+    pub repo_name: Option<String>,
 }
 
 impl GithubAdapter {

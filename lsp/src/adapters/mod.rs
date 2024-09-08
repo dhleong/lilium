@@ -88,6 +88,30 @@ impl InitializableAdapter {
             progress.report(Some("Ready!"), Some(100)).await;
         }
     }
+
+    pub async fn describe(&self) -> String {
+        let mut output = String::default();
+        output.push_str("Root: ");
+
+        let root = self
+            .root
+            .read()
+            .await
+            .clone()
+            .unwrap_or_else(|| "(failed to lock)".to_string());
+        output.push_str(&root);
+        output.push_str("\n\n");
+
+        let mutex = self.adapter.read().await;
+        let Some(adapter) = mutex.as_ref() else {
+            return format!("{output}Not Initialized");
+        };
+
+        let desc = adapter.describe().await;
+        output.push_str(&desc);
+
+        return output;
+    }
 }
 
 #[async_trait]

@@ -1,3 +1,4 @@
+local Window = require("lilium.window")
 local M = {}
 
 function M.install()
@@ -25,9 +26,58 @@ function M.install()
   end
 end
 
+function M.lilium_info()
+  local output = {
+    "# Lilium",
+    "",
+    "Loading...",
+  }
+  local function render()
+    return output
+  end
+
+  local bufnr = vim.fn.bufnr("%")
+  local info_window = Window:open({ render = render })
+
+  vim.lsp.buf_request(bufnr, "workspace/executeCommand", {
+    command = "lilium.info",
+    arguments = {
+      vim.uri_from_bufnr(bufnr),
+    },
+  }, function(err, result)
+    if err then
+      output = { "# Lilium: Error", "", vim.inspect(err) }
+    elseif type(result) == "string" then
+      output = {
+        "# Lilium",
+        "",
+        unpack(vim.fn.split(result, "\n")),
+      }
+    else
+      output = { "unexpected response type: " .. type(result) }
+    end
+    info_window:refresh()
+  end)
+end
+
 function M.setup(opts)
   M.install()
-  require("lspconfig").lilium.setup(opts or {})
+
+  opts = opts or {}
+  local user_on_attach = opts.on_attach
+  opts.on_attach = function(client, bufnr)
+    if user_on_attach then
+      user_on_attach(client, bufnr)
+    end
+
+    if client.name == "lilium" then
+      vim.api.nvim_buf_create_user_command(bufnr, "LiliumInfo", M.lilium_info, {
+        desc = "Lilium Info",
+      })
+    end
+  end
+
+  require("lspconfig").lilium.setup(opts)
 end
 
 return M
