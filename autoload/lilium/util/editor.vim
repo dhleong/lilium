@@ -98,7 +98,7 @@ endfunc
 func! s:CreateOnEditScriptNeovim(bufnr, sid)
     return [
         \ 'nvim -u NONE -i NONE -es << EOF',
-        \ "let sock = sockconnect('pipe', '$NVIM_LISTEN_ADDRESS', { 'rpc': 1 })",
+        \ "let sock = sockconnect('pipe', '$NVIM_CALLBACK_ADDRESS', { 'rpc': 1 })",
         \ "call rpcrequest(sock, 'nvim_exec', " .
         \   "'call " . a:sid . 'OnEdit(' . a:bufnr . ", [\"$editing\"])'," .
         \   '0)',
@@ -138,7 +138,7 @@ func! lilium#util#editor#Run(cmd, ...) " {{{
 
     let env = {
         \ 'EDITOR': editor,
-        \ 'NVIM_LISTEN_ADDRESS': v:servername,
+        \ 'NVIM_CALLBACK_ADDRESS': v:servername,
         \ 'LILIUM_TEMP': state.temp,
         \ }
 
