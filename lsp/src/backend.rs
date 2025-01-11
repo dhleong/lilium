@@ -125,7 +125,7 @@ impl LanguageServer for Backend {
                     )),
                     label: format!("{} {}", ticket.provider_prefix, ticket.title),
                     label_details: None,
-                    kind: Some(CompletionItemKind::TEXT),
+                    kind: Some(CompletionItemKind::REFERENCE),
                     detail: ticket.description,
                     sort_text: None, // TODO ?
                     insert_text: if is_simple_ticket_ref {
