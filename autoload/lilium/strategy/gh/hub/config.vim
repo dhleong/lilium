@@ -80,5 +80,8 @@ func! lilium#strategy#gh#hub#config#ReadToken(state) " {{
     endif
 
     let tokens = lilium#strategy#gh#hub#config#ReadTokens()
+    if tokens ==# ''
+        return ''
+    endif
     return get(tokens, host, '')
 endfunc " }}}
