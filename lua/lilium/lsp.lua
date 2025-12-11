@@ -96,11 +96,10 @@ function M.setup(opts)
 
   if not vim.lsp or not vim.lsp.config then
     M.install_legacy(opts)
-    return
+  else
+    vim.lsp.config("lilium", build_config())
+    vim.lsp.enable("lilium")
   end
-
-  vim.lsp.config("lilium", build_config())
-  vim.lsp.enable("lilium")
 end
 
 return M
