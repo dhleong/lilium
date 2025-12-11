@@ -1,29 +1,50 @@
 local Window = require("lilium.window")
 local M = {}
 
-function M.install()
+local function build_config()
+  local plugin_root = vim.fn["lilium#util#path#PluginRoot"]()
+
+  return {
+    cmd = {
+      plugin_root .. "/target/debug/lilium",
+      "lsp",
+    },
+    filetypes = { "gitcommit", "markdown" },
+    root_dir = function(startpath, on_dir)
+      -- Possibly unncessary backwards compat:
+      if not on_dir then
+        on_dir = function(dir)
+          return dir
+        end
+      end
+      if type(startpath) == "number" then
+        startpath = vim.fn.expand("#" .. startpath .. ":p")
+      end
+
+      -- Use the enhanced editor path, if set. This lets us provide LSP completion
+      -- to `gh pr` tmp files for the appropriate project!
+      local enhanced_editor_path = require("lilium.lsp.enhanced_editor").get_project_path_for_file(startpath)
+      if enhanced_editor_path then
+        return on_dir(enhanced_editor_path)
+      end
+
+      local git_dir = vim.fs.dirname(vim.fs.find(".git", { path = startpath, upward = true })[1])
+      return on_dir(git_dir)
+    end,
+  }
+end
+
+function M.install_legacy(opts)
   local configs = require("lspconfig.configs")
-
   if not configs.lilium then
-    local lspconfig = require("lspconfig")
-    local plugin_root = vim.fn["lilium#util#path#PluginRoot"]()
-
     configs.lilium = {
-      default_config = {
-        cmd = {
-          plugin_root .. "/target/debug/lilium",
-          "lsp",
-        },
-        filetypes = { "gitcommit", "markdown" },
-        root_dir = function(startpath)
-          -- Use the enhanced editor path, if set. This lets us provide LSP completion
-          -- to `gh pr` tmp files for the appropriate project!
-          local enhanced_editor_path = require("lilium.lsp.enhanced_editor").get_project_path_for_file(startpath)
-          return enhanced_editor_path or lspconfig.util.find_git_ancestor(startpath)
-        end,
-      },
+      default_config = build_config(),
     }
   end
+
+  opts = opts or {}
+
+  require("lspconfig").lilium.setup(opts)
 end
 
 function M.lilium_info()
@@ -61,23 +82,25 @@ function M.lilium_info()
 end
 
 function M.setup(opts)
-  M.install()
+  vim.api.nvim_create_autocmd("LspAttach", {
+    group = vim.api.nvim_create_augroup("lilium_lsp", { clear = true }),
+    callback = function(ev)
+      local client = vim.lsp.get_client_by_id(ev.data.client_id)
+      if client and client.name == "lilium" then
+        vim.api.nvim_buf_create_user_command(ev.buf, "LiliumInfo", M.lilium_info, {
+          desc = "Lilium Info",
+        })
+      end
+    end,
+  })
 
-  opts = opts or {}
-  local user_on_attach = opts.on_attach
-  opts.on_attach = function(client, bufnr)
-    if user_on_attach then
-      user_on_attach(client, bufnr)
-    end
-
-    if client.name == "lilium" then
-      vim.api.nvim_buf_create_user_command(bufnr, "LiliumInfo", M.lilium_info, {
-        desc = "Lilium Info",
-      })
-    end
+  if not vim.lsp or not vim.lsp.config then
+    M.install_legacy(opts)
+    return
   end
 
-  require("lspconfig").lilium.setup(opts)
+  vim.lsp.config("lilium", build_config())
+  vim.lsp.enable("lilium")
 end
 
 return M
