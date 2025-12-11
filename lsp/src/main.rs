@@ -37,13 +37,13 @@ async fn print_tickets(root: Option<String>) {
         })
         .await;
 
-    if let Err(err) = tickets {
-        println!("{:?}", err);
-        return;
-    }
-
-    for ticket in &tickets {
-        println!("{ticket:#?}");
+    match tickets {
+        Err(err) => println!("{:?}", err),
+        Ok(tickets) => {
+            for ticket in &tickets {
+                println!("{ticket:#?}");
+            }
+        }
     }
 }
 
